@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist Digital Human Capital — PT Tatalogam Group</title>
+</head>
+<body style="margin:0;padding:24px;background:#EDEAE2;min-height:100vh;font-family:sans-serif;">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+  :root{
+    --ink:#22262C; --steel:#5B6572; --steel-light:#AEB6BF;
+    --paper:#F3F1EC; --card:#FFFFFF; --safety:#F0A907; --safety-deep:#B9790A;
+    --ok:#2F8F5B; --line:#DEDAD0; --danger:#C24B3F;
+  }
+  *{box-sizing:border-box;}
+  .ock-root{
+    font-family:'Inter',sans-serif; color:var(--ink); background:var(--paper);
+    background-image:linear-gradient(var(--line) 1px, transparent 1px),linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:28px 28px; background-position:-1px -1px;
+    border-radius:14px; min-height:600px; overflow:hidden; border:1px solid var(--line);
+  }
+  .ock-header{ background:var(--ink); color:#fff; padding:18px 28px 0 28px; }
+  .ock-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; display:flex; align-items:center; gap:10px; }
+  .ock-title .mark{ width:30px;height:30px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:2px; }
+  .ock-title .mark img{ width:100%;height:100%;object-fit:contain; }
+  .ock-sub{ font-size:11.5px;color:#9AA2AC;font-family:'IBM Plex Mono',monospace;margin:2px 0 14px 0; }
+
+  .ock-type-switch{ display:flex; gap:6px; padding:0 28px 0 28px; }
+  .ock-type-btn{
+    flex:1; text-align:left; padding:10px 14px; border-radius:9px 9px 0 0;
+    border:1px solid transparent; background:rgba(255,255,255,0.06); color:#C7CCD3;
+    cursor:pointer; font-family:'Space Grotesk',sans-serif;
+  }
+  .ock-type-btn .t1{ font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;opacity:0.8; }
+  .ock-type-btn .t2{ font-size:13px;font-weight:700;margin-top:2px; }
+  .ock-type-btn.active{ background:var(--card); color:var(--ink); }
+  .ock-type-btn.active .t1{ color:var(--type-color, var(--safety-deep)); opacity:1; }
+
+  .ock-header-actions{ display:flex; justify-content:flex-end; padding:10px 28px 12px 28px; }
+  .ock-btn-export-all{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:11.5px;
+    padding:7px 13px; border-radius:7px; border:1px solid var(--safety);
+    background:rgba(240,169,7,0.12); color:var(--safety);
+    cursor:pointer;
+  }
+  .ock-btn-export-all:hover{ background:rgba(240,169,7,0.2); }
+
+  .ock-tabs{ display:flex;gap:6px;padding:12px 28px 0 28px;border-bottom:1px solid var(--line);background:var(--card);flex-wrap:wrap; }
+  .ock-tab{ font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;padding:9px 15px;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--steel);cursor:pointer;border-radius:7px 7px 0 0; }
+  .ock-tab.active{ background:var(--paper); color:var(--ink); border-color:var(--line); position:relative; top:1px; }
+  .ock-body{ background:var(--card); padding:22px 28px 28px 28px; min-height:460px; }
+
+  .ock-row-between{ display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px; }
+  .ock-h2{ font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16.5px; }
+  .ock-btn{ font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;padding:9px 15px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px; }
+  .ock-btn.ghost{ background:transparent;color:var(--ink);border:1px solid var(--line); }
+  .ock-btn.small{ padding:6px 10px;font-size:11.5px; }
+  .ock-btn.safety{ background:var(--safety);border-color:var(--safety-deep);color:var(--ink); }
+  .ock-btn.danger-ghost{ color:var(--danger);border-color:var(--danger);background:transparent; }
+  .ock-btn:disabled{ opacity:0.4;cursor:not-allowed; }
+
+  .ock-empty{ text-align:center;padding:56px 20px;color:var(--steel); }
+  .ock-empty .big{ font-family:'Space Grotesk',sans-serif;font-size:14.5px;color:var(--ink);font-weight:600;margin-bottom:6px; }
+
+  .ock-grid{ display:grid;grid-template-columns:repeat(auto-fill, minmax(240px,1fr));gap:13px; }
+  .ock-card{ border:1px solid var(--line);border-radius:10px;padding:15px;cursor:pointer;background:#fff;transition:box-shadow .15s, transform .15s; }
+  .ock-card:hover{ box-shadow:0 4px 14px rgba(34,38,44,0.09);transform:translateY(-1px); }
+  .ock-card-name{ font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14.5px; }
+  .ock-card-pos{ font-size:12px;color:var(--steel);margin-top:2px; }
+  .ock-card-meta{ font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--steel-light);margin-top:9px; }
+  .ock-progress-wrap{ margin-top:11px;height:6px;border-radius:4px;background:var(--paper);overflow:hidden;border:1px solid var(--line); }
+  .ock-progress-fill{ height:100%;background:var(--safety); }
+  .ock-progress-fill.done{ background:var(--ok); }
+  .ock-progress-label{ font-size:10.5px;color:var(--steel);margin-top:5px;font-family:'IBM Plex Mono',monospace; }
+  .ock-status-pill{ display:inline-block;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;font-family:'IBM Plex Mono',monospace; }
+  .ock-status-pill.progress{ background:#FDF1D6;color:var(--safety-deep); }
+  .ock-status-pill.done{ background:#E3F3EA;color:var(--ok); }
+
+  .ock-detail-header{ display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px dashed var(--line);padding-bottom:15px;margin-bottom:16px;flex-wrap:wrap;gap:14px; }
+  .ock-detail-meta-row{ font-size:12.5px;color:var(--steel);margin-top:4px; }
+  .ock-detail-meta-row b{ color:var(--ink); }
+  .ock-cat-block{ margin-bottom:20px; }
+  .ock-cat-title{ font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--steel);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line); }
+  .ock-item{ display:flex;gap:11px;align-items:flex-start;padding:10px 6px;border-radius:8px; }
+  .ock-item:hover{ background:var(--paper); }
+  .ock-stamp{ width:25px;height:25px;border-radius:50%;border:2px solid var(--steel-light);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:2px;font-size:13px;color:transparent;transition:transform .12s;background:#fff; }
+  .ock-stamp.checked{ border-color:var(--ok);color:var(--ok);transform:rotate(-9deg) scale(1.04);font-weight:700; }
+  .ock-item-title{ font-size:13px;font-weight:500; }
+  .ock-item-title.done{ color:var(--steel); }
+  .ock-item-note{ width:100%;margin-top:6px;font-size:12.5px;font-family:'Inter',sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 9px;background:#fff; }
+  .ock-item-note:focus{ outline:1.5px solid var(--safety); }
+
+  .ock-admin-cat{ margin-bottom:18px; }
+  .ock-cat-mgmt{
+    border:1px solid var(--safety-deep); border-radius:10px; padding:14px 16px;
+    background:#FFFBF0;
+  }
+  .ock-admin-list{ display:flex;flex-direction:column;gap:8px; }
+  .ock-admin-row{ display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:#fff; }
+  .ock-admin-row input[type=text]{ flex:1;border:none;font-size:13px;font-family:'Inter',sans-serif;background:transparent; }
+  .ock-admin-row input[type=text]:focus{ outline:none; }
+  .ock-order-btns{ display:flex;flex-direction:column;gap:1px; }
+  .ock-order-btns button{ border:none;background:transparent;cursor:pointer;color:var(--steel-light);font-size:10px;line-height:1;padding:2px; }
+  .ock-order-btns button:hover{ color:var(--ink); }
+
+  .ock-modal-bg{ position:fixed;inset:0;background:rgba(34,38,44,0.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px; }
+  .ock-modal{ background:#fff;border-radius:12px;padding:24px;width:100%;max-width:440px;font-family:'Inter',sans-serif;max-height:85vh;overflow-y:auto; }
+  .ock-modal h3{ font-family:'Space Grotesk',sans-serif;margin:0 0 4px 0;font-size:16px; }
+  .ock-modal .modal-sub{ font-size:12px;color:var(--steel);margin-bottom:16px;font-family:'IBM Plex Mono',monospace; }
+  .ock-field{ margin-bottom:12px; }
+  .ock-field label{ font-size:12px;font-weight:600;color:var(--steel);display:block;margin-bottom:4px; }
+  .ock-field input, .ock-field select{ width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:13.5px;font-family:'Inter',sans-serif; }
+  .ock-modal-actions{ display:flex;justify-content:flex-end;gap:8px;margin-top:16px; }
+
+  table.ock-table{ width:100%;border-collapse:collapse;font-size:12.5px; }
+  table.ock-table th{ text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--steel);border-bottom:1px solid var(--line);padding:8px 10px; }
+  table.ock-table td{ padding:9px 10px;border-bottom:1px solid var(--line); }
+  table.ock-table tr:hover td{ background:var(--paper); }
+  .ock-link-btn{ background:none;border:none;color:var(--safety-deep);font-weight:600;cursor:pointer;font-size:12px;padding:0; }
+  .ock-toast{ position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:60;font-family:'Inter',sans-serif; }
+
+  .ock-signoff{
+    margin-top:8px; border:1px dashed var(--steel-light); border-radius:10px;
+    padding:16px 18px; background:var(--paper);
+  }
+  .ock-signoff-title{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.06em;color:var(--steel);margin-bottom:12px;
+  }
+  .ock-signoff-grid{ display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+  .ock-sigpad-wrap{ margin-top:14px; }
+  .ock-sigpad-wrap label{ font-size:11.5px;color:var(--steel);font-weight:600;display:block;margin-bottom:5px; }
+  .ock-sigpad-box{
+    position:relative; border:1.5px dashed var(--steel-light); border-radius:8px;
+    background:#fff; overflow:hidden; touch-action:none;
+  }
+  .ock-sigpad-box canvas{ display:block; width:100%; height:130px; cursor:crosshair; }
+  .ock-sigpad-placeholder{
+    position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center;
+    padding-bottom:10px; font-size:11px; color:var(--steel-light); font-family:'IBM Plex Mono',monospace;
+    pointer-events:none;
+  }
+  .ock-sigpad-actions{ display:flex; justify-content:flex-end; margin-top:6px; }
+  .ock-signoff-field label{ font-size:11.5px;color:var(--steel);font-weight:600;display:block;margin-bottom:5px; }
+  .ock-signoff-field input{ width:100%;padding:8px 10px;border:none;border-bottom:1.5px solid var(--steel-light);background:transparent;font-size:13.5px;font-family:'Inter',sans-serif; }
+  .ock-signoff-field input:focus{ outline:none;border-bottom-color:var(--safety-deep); }
+  .ock-signoff-hint{ font-size:10.5px;color:var(--steel-light);margin-top:3px; }
+</style>
+
+<div id="ock-app" class="ock-root"></div>
+
+<script>
+const storage = {
+  async get(key){
+    const res = await fetch('/api/storage?key=' + encodeURIComponent(key));
+    if(!res.ok) throw new Error('Gagal mengambil data');
+    const data = await res.json();
+    if(data.value === null || data.value === undefined) return null;
+    return { key, value: data.value };
+  },
+  async set(key, value){
+    const res = await fetch('/api/storage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, value })
+    });
+    if(!res.ok) throw new Error('Gagal menyimpan data');
+    return { key, value };
+  },
+  async delete(key){
+    const res = await fetch('/api/storage?key=' + encodeURIComponent(key), { method: 'DELETE' });
+    if(!res.ok) throw new Error('Gagal menghapus data');
+    return { key, deleted: true };
+  }
+};
+(function(){
+  const LOGO_URL = '/images/logo-tatalogam.png';
+  let LOGO_DATA_URI = null;
+  function loadLogoForPdf(){
+    fetch(LOGO_URL)
+      .then(r => r.blob())
+      .then(blob => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      }))
+      .then(dataUrl => { LOGO_DATA_URI = dataUrl; })
+      .catch(() => { /* logo optional in PDF if this fails */ });
+  }
+  loadLogoForPdf();
+  const DEFAULT_CATEGORIES = ["Dokumen & Administrasi","Akses & Sistem","Perlengkapan Kerja","Orientasi & Proses Akhir"];
+
+  const TYPES = {
+    onboarding: { label:'Onboarding', full:'Checklist Karyawan Baru (Onboarding)', color:'#B9790A', bg:'#FDF1D6' },
+    mutasi:     { label:'Mutasi & Rotasi', full:'Checklist Job Rotasi Karyawan (Mutasi / Promosi / Demosi)', color:'#3B6FA6', bg:'#E8EEF5' },
+    resign:     { label:'Resign', full:'Checklist Karyawan Resign', color:'#7B5EA7', bg:'#EFE9F5' },
+  };
+
+  const DEFAULT_TEMPLATES = {
+    onboarding: [
+      {title:"Tanda tangan kontrak PKWT", category:"Dokumen & Administrasi"},
+      {title:"Pengumpulan dokumen (KTP, NPWP, ijazah, rekening)", category:"Dokumen & Administrasi"},
+      {title:"Pendaftaran BPJS Ketenagakerjaan & Kesehatan", category:"Dokumen & Administrasi"},
+      {title:"Pembuatan akun Talenta (HRIS)", category:"Akses & Sistem"},
+      {title:"Pembuatan email perusahaan", category:"Akses & Sistem"},
+      {title:"Aktivasi akses WhatsApp HCM Chatbot", category:"Akses & Sistem"},
+      {title:"ID card & akses masuk kantor / cabang", category:"Perlengkapan Kerja"},
+      {title:"Perlengkapan kerja (laptop, APD, seragam)", category:"Perlengkapan Kerja"},
+      {title:"Company induction & pengenalan budaya kerja", category:"Orientasi & Proses Akhir"},
+      {title:"Pengenalan tim & job desk", category:"Orientasi & Proses Akhir"},
+      {title:"Pelatihan dasar K3 / ISO awareness", category:"Orientasi & Proses Akhir"},
+    ],
+    mutasi: [
+      {title:"Surat Keputusan (SK) Mutasi/Promosi/Demosi", category:"Dokumen & Administrasi"},
+      {title:"Update / addendum kontrak kerja", category:"Dokumen & Administrasi"},
+      {title:"Penyesuaian gaji & tunjangan (jika ada)", category:"Dokumen & Administrasi"},
+      {title:"Update data posisi di HRIS (Talenta)", category:"Akses & Sistem"},
+      {title:"Update akses sistem sesuai posisi baru", category:"Akses & Sistem"},
+      {title:"Update ID card / akses area kerja baru", category:"Perlengkapan Kerja"},
+      {title:"Serah terima tugas & tanggung jawab (handover)", category:"Orientasi & Proses Akhir"},
+      {title:"Informasi ke atasan lama & atasan baru", category:"Orientasi & Proses Akhir"},
+      {title:"Sosialisasi perubahan ke tim terkait", category:"Orientasi & Proses Akhir"},
+    ],
+    resign: [
+      {title:"Surat pengunduran diri diterima", category:"Dokumen & Administrasi"},
+      {title:"Perhitungan hak karyawan (pesangon, sisa cuti, dll)", category:"Dokumen & Administrasi"},
+      {title:"Surat Keterangan Kerja (jika diminta)", category:"Dokumen & Administrasi"},
+      {title:"Pelaporan WLKP/PHK ke Kementerian Ketenagakerjaan", category:"Dokumen & Administrasi"},
+      {title:"Nonaktifkan akun & akses sistem (Talenta, email)", category:"Akses & Sistem"},
+      {title:"Nonaktifkan akses WhatsApp HCM Chatbot", category:"Akses & Sistem"},
+      {title:"Pengembalian aset perusahaan (laptop, ID card, dll)", category:"Perlengkapan Kerja"},
+      {title:"Exit interview", category:"Orientasi & Proses Akhir"},
+      {title:"Clearance sheet ditandatangani semua pihak terkait", category:"Orientasi & Proses Akhir"},
+    ],
+  };
+
+  let state = {
+    type: 'onboarding',
+    tab: 'aktif',
+    templates: {},
+    categories: {},
+    employees: [],
+    activeId: null,
+    loading: true,
+    modal: null,
+    toast: null,
+  };
+
+  function uid(p){ return p + "_" + Math.random().toString(36).slice(2,9); }
+  function esc(s){ return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+  async function loadAll(){
+    state.templates = {};
+    state.categories = {};
+    for(const key of Object.keys(TYPES)){
+      try{
+        const catData = await storage.get('categories:'+key);
+        if(catData){ state.categories[key] = JSON.parse(catData.value); }
+        else{
+          state.categories[key] = DEFAULT_CATEGORIES.slice();
+          await storage.set('categories:'+key, JSON.stringify(state.categories[key]));
+        }
+      }catch(e){
+        state.categories[key] = DEFAULT_CATEGORIES.slice();
+      }
+      try{
+        const tpl = await storage.get('template:'+key);
+        if(tpl){ state.templates[key] = JSON.parse(tpl.value); }
+        else{
+          state.templates[key] = DEFAULT_TEMPLATES[key].map((t,i)=>({id:uid('itm'),title:t.title,category:t.category,order:i}));
+          await storage.set('template:'+key, JSON.stringify(state.templates[key]));
+        }
+      }catch(e){
+        state.templates[key] = DEFAULT_TEMPLATES[key].map((t,i)=>({id:uid('itm'),title:t.title,category:t.category,order:i}));
+      }
+    }
+    try{
+      const idx = await storage.get('employees-index');
+      const ids = idx ? JSON.parse(idx.value) : [];
+      const emps = [];
+      for(const id of ids){
+        try{ const rec = await storage.get('employee:'+id); if(rec) emps.push(JSON.parse(rec.value)); }catch(e){}
+      }
+      state.employees = emps.map(e=>{
+        if(!e.signOff) e.signOff = {pic:'', ttd:'', date:''};
+        if(e.signOff.name!==undefined && e.signOff.pic===undefined){ e.signOff = {pic:e.signOff.name||'', ttd:'', date:e.signOff.date||''}; }
+        return e;
+      });
+    }catch(e){ state.employees = []; }
+    state.loading = false;
+    render();
+  }
+
+  async function saveTemplate(type){ await storage.set('template:'+type, JSON.stringify(state.templates[type])); }
+  async function saveCategories(type){ await storage.set('categories:'+type, JSON.stringify(state.categories[type])); }
+  async function saveEmployee(emp){ await storage.set('employee:'+emp.id, JSON.stringify(emp)); }
+  async function saveIndex(){ await storage.set('employees-index', JSON.stringify(state.employees.map(e=>e.id))); }
+  async function deleteEmployeeStorage(id){ try{ await storage.delete('employee:'+id); }catch(e){} }
+
+  function showToast(msg){ state.toast = msg; render(); setTimeout(()=>{ state.toast=null; render(); }, 2200); }
+
+  function currentTemplate(){ return state.templates[state.type] || []; }
+  function currentCategories(){ return state.categories[state.type] || []; }
+  function typedEmployees(){ return state.employees.filter(e=>e.formType===state.type); }
+
+  function computeProgress(emp){
+    const tpl = state.templates[emp.formType] || [];
+    const total = tpl.length || 1;
+    const done = tpl.filter(it => emp.checklist[it.id] && emp.checklist[it.id].done).length;
+    return {done, total, pct: Math.round((done/total)*100)};
+  }
+
+  function metaLine(emp){
+    if(emp.formType==='onboarding') return 'Mulai kerja: ' + esc(emp.meta.startDate||'-');
+    if(emp.formType==='mutasi') return esc(emp.meta.changeType||'-') + ' → ' + esc(emp.meta.newPosition||'-') + ' · Efektif: ' + esc(emp.meta.effectiveDate||'-');
+    if(emp.formType==='resign') return 'Resign: ' + esc(emp.meta.resignDate||'-') + (emp.meta.reason? ' · '+esc(emp.meta.reason):'');
+    return '';
+  }
+
+  // ---------- RENDER ----------
+  function render(){
+    const app = document.getElementById('ock-app');
+    if(state.loading){ app.innerHTML = `<div class="ock-empty" style="padding:100px 20px;">Memuat data...</div>`; return; }
+    let html = `
+      <div class="ock-header">
+        <div class="ock-title"><span class="mark"><img src="/images/logo-tatalogam.png" alt="Tatalogam Group" /></span>Checklist Digital Human Capital</div>
+        <div class="ock-sub">PT TATALOGAM GROUP — 1 LINK, 3 JENIS PROSES</div>
+        <div class="ock-type-switch">
+          ${Object.keys(TYPES).map(k=>typeBtn(k)).join('')}
+        </div>
+        <div class="ock-header-actions">
+          <button class="ock-btn-export-all" onclick="OCK.exportAllPDF()">Export Semua sebagai PDF (Onboarding + Mutasi + Resign)</button>
+        </div>
+      </div>
+      <div class="ock-tabs">
+        ${tabBtn('aktif','Aktif')}
+        ${tabBtn('riwayat','Riwayat')}
+        ${tabBtn('admin','Panel Admin')}
+      </div>
+      <div class="ock-body">
+        ${state.tab==='aktif' ? renderAktif() : ''}
+        ${state.tab==='riwayat' ? renderRiwayat() : ''}
+        ${state.tab==='admin' ? renderAdmin() : ''}
+        ${state.activeId ? renderDetail() : ''}
+      </div>
+      ${state.modal==='new-employee' ? renderNewEmployeeModal() : ''}
+      ${state.toast ? `<div class="ock-toast">${esc(state.toast)}</div>` : ''}
+    `;
+    app.innerHTML = html;
+    if(state.activeId && !state.modal){
+      requestAnimationFrame(()=>setupSignaturePad(state.activeId));
+    }
+  }
+
+  function typeBtn(key){
+    const t = TYPES[key];
+    return `<button class="ock-type-btn ${state.type===key?'active':''}" style="--type-color:${t.color}" onclick="OCK.setType('${key}')">
+      <div class="t1">${key==='onboarding'?'01 · KARYAWAN BARU':key==='mutasi'?'02 · MUTASI/ROTASI':'03 · RESIGN'}</div>
+      <div class="t2">${t.label}</div>
+    </button>`;
+  }
+  function tabBtn(key,label){ return `<button class="ock-tab ${state.tab===key?'active':''}" onclick="OCK.setTab('${key}')">${label}</button>`; }
+
+  function renderAktif(){
+    if(state.activeId) return '';
+    const list = typedEmployees().filter(e=>e.status!=='selesai');
+    let body;
+    if(list.length===0){
+      body = `<div class="ock-empty"><div class="big">Belum ada proses ${esc(TYPES[state.type].label)} yang aktif</div>Buat proses baru untuk mulai checklist-nya.</div>`;
+    }else{
+      body = `<div class="ock-grid">${list.map(cardHtml).join('')}</div>`;
+    }
+    return `
+      <div class="ock-row-between">
+        <div class="ock-h2">${esc(TYPES[state.type].full)} <span style="color:var(--steel);font-weight:400;font-size:12.5px;">(${list.length} aktif)</span></div>
+        <button class="ock-btn safety" onclick="OCK.openNewEmployee()">+ Buat Proses Baru</button>
+      </div>
+      ${body}
+    `;
+  }
+
+  function cardHtml(emp){
+    const p = computeProgress(emp);
+    return `
+      <div class="ock-card" onclick="OCK.openDetail('${emp.id}')">
+        <span class="ock-status-pill ${p.pct===100?'done':'progress'}">${p.pct===100?'SELESAI':'BERJALAN'}</span>
+        <div class="ock-card-name" style="margin-top:8px;">${esc(emp.name)}</div>
+        <div class="ock-card-pos">${esc(emp.position)}${emp.branch? ' · '+esc(emp.branch):''}</div>
+        <div class="ock-progress-wrap"><div class="ock-progress-fill ${p.pct===100?'done':''}" style="width:${p.pct}%"></div></div>
+        <div class="ock-progress-label">${p.done}/${p.total} item · ${p.pct}%</div>
+        <div class="ock-card-meta">${metaLine(emp).toUpperCase()}</div>
+      </div>
+    `;
+  }
+
+  function renderRiwayat(){
+    if(state.activeId) return '';
+    const list = typedEmployees();
+    if(list.length===0){
+      return `<div class="ock-row-between"><div class="ock-h2">Riwayat — ${esc(TYPES[state.type].label)}</div></div>
+        <div class="ock-empty"><div class="big">Belum ada riwayat</div>Riwayat proses akan muncul di sini.</div>`;
+    }
+    const rows = list.map(emp=>{
+      const p = computeProgress(emp);
+      return `<tr>
+        <td>${esc(emp.name)}</td>
+        <td>${esc(emp.position)}</td>
+        <td>${esc(emp.branch||'-')}</td>
+        <td style="font-size:11.5px;">${metaLine(emp)}</td>
+        <td><span class="ock-status-pill ${p.pct===100?'done':'progress'}">${p.pct===100?'SELESAI':'BERJALAN'}</span></td>
+        <td>${p.done}/${p.total} (${p.pct}%)</td>
+        <td>
+          <button class="ock-link-btn" onclick="OCK.openDetail('${emp.id}')">Lihat</button> ·
+          <button class="ock-link-btn" onclick="OCK.exportPDF('${emp.id}')">PDF</button>
+        </td>
+      </tr>`;
+    }).join('');
+    return `
+      <div class="ock-row-between">
+        <div class="ock-h2">Riwayat — ${esc(TYPES[state.type].label)} <span style="color:var(--steel);font-weight:400;font-size:12.5px;">(${list.length})</span></div>
+        <button class="ock-btn ghost" onclick="OCK.exportExcelAll()">Export Excel (jenis ini)</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="ock-table">
+          <thead><tr><th>Nama</th><th>Posisi</th><th>Cabang</th><th>Info</th><th>Status</th><th>Progress</th><th>Aksi</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function renderAdmin(){
+    if(state.activeId) return '';
+    const tpl = currentTemplate();
+    const cats = currentCategories();
+
+    const catMgmt = `
+      <div class="ock-cat-mgmt">
+        <div class="ock-cat-title" style="margin-bottom:10px;">Kelola Sub Pertanyaan / Kategori</div>
+        <div class="ock-admin-list">
+          ${cats.map((cat,idx)=>{
+            const count = tpl.filter(i=>i.category===cat).length;
+            return `
+              <div class="ock-admin-row">
+                <div class="ock-order-btns">
+                  <button onclick="OCK.moveCategory('${esc(cat)}',-1)" ${idx===0?'disabled':''}>▲</button>
+                  <button onclick="OCK.moveCategory('${esc(cat)}',1)" ${idx===cats.length-1?'disabled':''}>▼</button>
+                </div>
+                <input type="text" value="${esc(cat)}" onchange="OCK.renameCategory('${esc(cat)}', this.value)" />
+                <span style="font-size:11px;color:var(--steel-light);font-family:'IBM Plex Mono',monospace;white-space:nowrap;">${count} item</span>
+                <button class="ock-btn danger-ghost small" onclick="OCK.deleteCategory('${esc(cat)}')">Hapus</button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div style="margin-top:8px;">
+          <input type="text" id="new-cat-input" placeholder="Tambah kategori / sub pertanyaan baru..." style="width:68%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;font-family:'Inter',sans-serif;" />
+          <button class="ock-btn ghost small" onclick="OCK.addCategory('new-cat-input')">+ Tambah Kategori</button>
+        </div>
+      </div>
+    `;
+
+    const groups = cats.map(cat=>{
+      const items = tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order);
+      return `
+        <div class="ock-admin-cat">
+          <div class="ock-cat-title">${esc(cat)}</div>
+          <div class="ock-admin-list">
+            ${items.map((it,idx)=>`
+              <div class="ock-admin-row">
+                <div class="ock-order-btns">
+                  <button onclick="OCK.moveItem('${it.id}',-1)" ${idx===0?'disabled':''}>▲</button>
+                  <button onclick="OCK.moveItem('${it.id}',1)" ${idx===items.length-1?'disabled':''}>▼</button>
+                </div>
+                <input type="text" value="${esc(it.title)}" onchange="OCK.editItemTitle('${it.id}', this.value)" />
+                <button class="ock-btn danger-ghost small" onclick="OCK.deleteItem('${it.id}')">Hapus</button>
+              </div>
+            `).join('') || '<div style="color:var(--steel-light);font-size:12px;padding:6px 2px;">Belum ada item.</div>'}
+          </div>
+          <div style="margin-top:8px;">
+            <input type="text" id="new-item-${slug(cat)}" placeholder="Tambah item baru untuk ${esc(cat)}..." style="width:68%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;font-family:'Inter',sans-serif;" />
+            <button class="ock-btn ghost small" onclick="OCK.addItem('${esc(cat)}','new-item-${slug(cat)}')">+ Tambah</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+    return `
+      <div class="ock-row-between"><div class="ock-h2">Panel Admin — Template ${esc(TYPES[state.type].label)}</div></div>
+      <p style="color:var(--steel);font-size:12px;margin-top:-8px;margin-bottom:16px;">Setiap jenis proses (Onboarding / Mutasi / Resign) punya template checklist & kategori sendiri-sendiri. Perubahan di sini hanya berlaku untuk jenis <b>${esc(TYPES[state.type].label)}</b>.</p>
+      ${catMgmt}
+      <div style="height:1px;background:var(--line);margin:20px 0;"></div>
+      ${groups}
+    `;
+  }
+
+  function renderDetail(){
+    const emp = state.employees.find(e=>e.id===state.activeId);
+    if(!emp) return '';
+    const tpl = state.templates[emp.formType] || [];
+    const cats = state.categories[emp.formType] || [];
+    const p = computeProgress(emp);
+    const groups = cats.map(cat=>{
+      const items = tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order);
+      if(items.length===0) return '';
+      return `
+        <div class="ock-cat-block">
+          <div class="ock-cat-title">${esc(cat)}</div>
+          ${items.map(it=>{
+            const st = emp.checklist[it.id] || {done:false, note:''};
+            return `
+              <div class="ock-item">
+                <div class="ock-stamp ${st.done?'checked':''}" onclick="OCK.toggleItem('${emp.id}','${it.id}')">${st.done?'✓':''}</div>
+                <div style="flex:1;">
+                  <div class="ock-item-title ${st.done?'done':''}">${esc(it.title)}</div>
+                  <input class="ock-item-note" placeholder="Catatan (opsional)" value="${esc(st.note)}" onchange="OCK.setNote('${emp.id}','${it.id}', this.value)" />
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }).join('');
+
+    const so = emp.signOff || {pic:'', ttd:'', date:''};
+    const signoffBlock = `
+      <div class="ock-signoff">
+        <div class="ock-signoff-title">Pengesahan Formulir</div>
+        <div class="ock-signoff-grid">
+          <div class="ock-signoff-field">
+            <label>Nama PIC</label>
+            <input type="text" placeholder="Nama lengkap" value="${esc(so.pic)}" onchange="OCK.setSignOff('${emp.id}','pic', this.value)" />
+          </div>
+          <div class="ock-signoff-field">
+            <label>Tanggal Pengisian</label>
+            <input type="date" value="${esc(so.date)}" onchange="OCK.setSignOff('${emp.id}','date', this.value)" />
+          </div>
+        </div>
+        <div class="ock-sigpad-wrap">
+          <label>TTD (tanda tangan langsung di kotak ini)</label>
+          <div class="ock-sigpad-box">
+            <canvas id="sigpad-${emp.id}" width="600" height="160"></canvas>
+            ${so.ttd ? '' : '<div class="ock-sigpad-placeholder">tanda tangan di sini</div>'}
+          </div>
+          <div class="ock-sigpad-actions">
+            <button class="ock-btn ghost small" onclick="OCK.clearSignature('${emp.id}')">Bersihkan</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    return `
+      <div>
+        <button class="ock-btn ghost small" onclick="OCK.closeDetail()">← Kembali</button>
+        <div class="ock-detail-header" style="margin-top:15px;">
+          <div>
+            <span class="ock-status-pill" style="background:${TYPES[emp.formType].bg};color:${TYPES[emp.formType].color};margin-bottom:6px;">${esc(TYPES[emp.formType].label).toUpperCase()}</span>
+            <div class="ock-h2" style="margin-top:6px;">${esc(emp.name)}</div>
+            <div class="ock-detail-meta-row"><b>${esc(emp.position)}</b>${emp.branch? ' · '+esc(emp.branch):''}</div>
+            <div class="ock-detail-meta-row">${metaLine(emp)}</div>
+          </div>
+          <div style="text-align:right;">
+            <span class="ock-status-pill ${p.pct===100?'done':'progress'}">${p.pct===100?'SELESAI':'BERJALAN'}</span>
+            <div class="ock-progress-wrap" style="width:150px;margin-top:8px;"><div class="ock-progress-fill ${p.pct===100?'done':''}" style="width:${p.pct}%"></div></div>
+            <div class="ock-progress-label">${p.done}/${p.total} item · ${p.pct}%</div>
+          </div>
+        </div>
+        ${groups}
+        ${signoffBlock}
+        <div class="ock-row-between" style="margin-top:16px;border-top:1px solid var(--line);padding-top:15px;">
+          <button class="ock-btn danger-ghost" onclick="OCK.deleteEmployee('${emp.id}')">Hapus Proses Ini</button>
+          <div style="display:flex;gap:8px;">
+            <button class="ock-btn ghost" onclick="OCK.exportPDF('${emp.id}')">Export PDF</button>
+            <button class="ock-btn safety" onclick="OCK.markDone('${emp.id}')" ${p.pct===100?'disabled':''}>Tandai Selesai</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderNewEmployeeModal(){
+    const type = state.type;
+    let extraFields = '';
+    if(type==='onboarding'){
+      extraFields = `<div class="ock-field"><label>Tanggal Mulai Kerja</label><input id="f-m1" type="date" /></div>`;
+    }else if(type==='mutasi'){
+      extraFields = `
+        <div class="ock-field"><label>Jenis Perubahan</label>
+          <select id="f-m1"><option value="Promosi">Promosi</option><option value="Demosi">Demosi</option><option value="Rotasi">Rotasi</option></select>
+        </div>
+        <div class="ock-field"><label>Posisi Baru</label><input id="f-m2" type="text" placeholder="cth. Supervisor Marketing" /></div>
+        <div class="ock-field"><label>Tanggal Efektif</label><input id="f-m3" type="date" /></div>
+      `;
+    }else if(type==='resign'){
+      extraFields = `
+        <div class="ock-field"><label>Tanggal Resign</label><input id="f-m1" type="date" /></div>
+        <div class="ock-field"><label>Alasan</label>
+          <select id="f-m2"><option value="Resign Pribadi">Resign Pribadi</option><option value="Kontrak Selesai">Kontrak Selesai</option><option value="PHK">PHK</option></select>
+        </div>
+      `;
+    }
+    return `
+      <div class="ock-modal-bg" onclick="if(event.target===this) OCK.closeModal()">
+        <div class="ock-modal">
+          <h3>Buat Proses Baru</h3>
+          <div class="modal-sub">${esc(TYPES[type].full)}</div>
+          <div class="ock-field"><label>Nama Karyawan</label><input id="f-name" type="text" placeholder="cth. Dewi Anggraini" /></div>
+          <div class="ock-field"><label>Posisi ${type==='mutasi'?'Saat Ini':''}</label><input id="f-pos" type="text" placeholder="cth. Staff Marketing" /></div>
+          <div class="ock-field"><label>Cabang</label><input id="f-branch" type="text" placeholder="cth. Jakarta Pusat" /></div>
+          ${extraFields}
+          <div class="ock-modal-actions">
+            <button class="ock-btn ghost" onclick="OCK.closeModal()">Batal</button>
+            <button class="ock-btn safety" onclick="OCK.createEmployee()">Buat Checklist</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function setupSignaturePad(empId){
+    const canvas = document.getElementById('sigpad-'+empId);
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const emp = state.employees.find(e=>e.id===empId);
+    const so = emp && emp.signOff ? emp.signOff : {ttd:''};
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle = '#22262C';
+    ctx.lineWidth = 2.4;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    if(so.ttd){
+      const img = new Image();
+      img.onload = ()=>{ ctx.drawImage(img,0,0,canvas.width,canvas.height); };
+      img.src = so.ttd;
+    }
+
+    let drawing = false;
+    let last = null;
+
+    function posFromEvent(e){
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const point = e.touches ? e.touches[0] : e;
+      return { x: (point.clientX - rect.left) * scaleX, y: (point.clientY - rect.top) * scaleY };
+    }
+
+    function start(e){ e.preventDefault(); drawing = true; last = posFromEvent(e); }
+    function move(e){
+      if(!drawing) return;
+      e.preventDefault();
+      const p = posFromEvent(e);
+      ctx.beginPath();
+      ctx.moveTo(last.x, last.y);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      last = p;
+    }
+    async function end(e){
+      if(!drawing) return;
+      drawing = false;
+      const dataUrl = canvas.toDataURL('image/png');
+      await OCK.setSignOff(empId, 'ttd', dataUrl);
+    }
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', end);
+    canvas.addEventListener('touchstart', start, {passive:false});
+    canvas.addEventListener('touchmove', move, {passive:false});
+    canvas.addEventListener('touchend', end);
+  }
+
+  // ---------- ACTIONS ----------
+  const OCK = {
+    setType(t){ state.type=t; state.tab='aktif'; state.activeId=null; render(); },
+    setTab(t){ state.tab=t; state.activeId=null; render(); },
+    openDetail(id){ state.activeId=id; render(); },
+    closeDetail(){ state.activeId=null; render(); },
+    openNewEmployee(){ state.modal='new-employee'; render(); },
+    closeModal(){ state.modal=null; render(); },
+
+    async createEmployee(){
+      const type = state.type;
+      const name = document.getElementById('f-name').value.trim();
+      const position = document.getElementById('f-pos').value.trim();
+      const branch = document.getElementById('f-branch').value.trim();
+      let meta = {};
+      if(type==='onboarding'){
+        const startDate = document.getElementById('f-m1').value;
+        if(!name||!position||!startDate){ showToast('Lengkapi nama, posisi, dan tanggal mulai'); return; }
+        meta = { startDate };
+      }else if(type==='mutasi'){
+        const changeType = document.getElementById('f-m1').value;
+        const newPosition = document.getElementById('f-m2').value.trim();
+        const effectiveDate = document.getElementById('f-m3').value;
+        if(!name||!position||!newPosition||!effectiveDate){ showToast('Lengkapi semua field wajib'); return; }
+        meta = { changeType, newPosition, effectiveDate };
+      }else if(type==='resign'){
+        const resignDate = document.getElementById('f-m1').value;
+        const reason = document.getElementById('f-m2').value;
+        if(!name||!position||!resignDate){ showToast('Lengkapi nama, posisi, dan tanggal resign'); return; }
+        meta = { resignDate, reason };
+      }
+      const emp = { id: uid('emp'), formType: type, name, position, branch, meta, createdAt: new Date().toISOString(), checklist:{}, signOff:{pic:'',ttd:'',date:''}, status:'in_progress' };
+      state.employees.unshift(emp);
+      state.modal = null;
+      render();
+      await saveEmployee(emp);
+      await saveIndex();
+      showToast('Proses untuk '+name+' dibuat');
+    },
+
+    async toggleItem(empId, itemId){
+      const emp = state.employees.find(e=>e.id===empId);
+      if(!emp) return;
+      const cur = emp.checklist[itemId] || {done:false, note:''};
+      cur.done = !cur.done;
+      emp.checklist[itemId] = cur;
+      render();
+      await saveEmployee(emp);
+    },
+
+    async setNote(empId, itemId, val){
+      const emp = state.employees.find(e=>e.id===empId);
+      if(!emp) return;
+      const cur = emp.checklist[itemId] || {done:false, note:''};
+      cur.note = val;
+      emp.checklist[itemId] = cur;
+      await saveEmployee(emp);
+    },
+
+    async setSignOff(empId, field, val){
+      const emp = state.employees.find(e=>e.id===empId);
+      if(!emp) return;
+      if(!emp.signOff) emp.signOff = {pic:'', ttd:'', date:''};
+      emp.signOff[field] = val;
+      await saveEmployee(emp);
+    },
+
+    async clearSignature(empId){
+      const emp = state.employees.find(e=>e.id===empId);
+      if(!emp) return;
+      if(!emp.signOff) emp.signOff = {pic:'', ttd:'', date:''};
+      emp.signOff.ttd = '';
+      await saveEmployee(emp);
+      render();
+    },
+
+    async markDone(empId){
+      const emp = state.employees.find(e=>e.id===empId);
+      if(!emp) return;
+      emp.status = 'selesai';
+      if(emp.signOff && !emp.signOff.date){ emp.signOff.date = todayISO(); }
+      render();
+      await saveEmployee(emp);
+      showToast('Ditandai selesai');
+    },
+
+    async deleteEmployee(empId){
+      if(!confirm('Hapus proses ini beserta riwayatnya?')) return;
+      state.employees = state.employees.filter(e=>e.id!==empId);
+      state.activeId = null;
+      render();
+      await deleteEmployeeStorage(empId);
+      await saveIndex();
+      showToast('Data dihapus');
+    },
+
+    async addCategory(inputId){
+      const el = document.getElementById(inputId);
+      const name = el.value.trim();
+      if(!name) return;
+      const cats = state.categories[state.type];
+      if(cats.includes(name)){ showToast('Kategori sudah ada'); return; }
+      cats.push(name);
+      render();
+      await saveCategories(state.type);
+      showToast('Kategori ditambahkan');
+    },
+
+    async renameCategory(oldName, newVal){
+      const newName = newVal.trim();
+      if(!newName || newName===oldName) { render(); return; }
+      const cats = state.categories[state.type];
+      const idx = cats.indexOf(oldName);
+      if(idx===-1) return;
+      if(cats.includes(newName)){ showToast('Nama kategori sudah dipakai'); render(); return; }
+      cats[idx] = newName;
+      const tpl = currentTemplate();
+      tpl.forEach(it=>{ if(it.category===oldName) it.category = newName; });
+      render();
+      await saveCategories(state.type);
+      await saveTemplate(state.type);
+      showToast('Kategori diubah');
+    },
+
+    async deleteCategory(name){
+      const tpl = currentTemplate();
+      const hasItems = tpl.some(it=>it.category===name);
+      if(hasItems){ showToast('Hapus/pindahkan item di kategori ini dulu sebelum menghapus kategorinya'); return; }
+      if(!confirm('Hapus kategori "'+name+'"?')) return;
+      state.categories[state.type] = state.categories[state.type].filter(c=>c!==name);
+      render();
+      await saveCategories(state.type);
+      showToast('Kategori dihapus');
+    },
+
+    async moveCategory(name, dir){
+      const cats = state.categories[state.type];
+      const idx = cats.indexOf(name);
+      const swapIdx = idx+dir;
+      if(idx===-1 || swapIdx<0 || swapIdx>=cats.length) return;
+      const tmp = cats[idx]; cats[idx] = cats[swapIdx]; cats[swapIdx] = tmp;
+      render();
+      await saveCategories(state.type);
+    },
+
+    async addItem(cat, inputId){
+      const el = document.getElementById(inputId);
+      const title = el.value.trim();
+      if(!title) return;
+      const tpl = currentTemplate();
+      const orders = tpl.filter(i=>i.category===cat).map(i=>i.order);
+      const nextOrder = orders.length? Math.max(...orders)+1 : 0;
+      tpl.push({id: uid('itm'), title, category: cat, order: nextOrder});
+      render();
+      await saveTemplate(state.type);
+      showToast('Item ditambahkan');
+    },
+
+    async editItemTitle(itemId, val){
+      const it = currentTemplate().find(i=>i.id===itemId);
+      if(!it) return;
+      it.title = val;
+      await saveTemplate(state.type);
+    },
+
+    async deleteItem(itemId){
+      if(!confirm('Hapus item checklist ini dari template?')) return;
+      state.templates[state.type] = currentTemplate().filter(i=>i.id!==itemId);
+      render();
+      await saveTemplate(state.type);
+    },
+
+    async moveItem(itemId, dir){
+      const tpl = currentTemplate();
+      const it = tpl.find(i=>i.id===itemId);
+      if(!it) return;
+      const siblings = tpl.filter(i=>i.category===it.category).sort((a,b)=>a.order-b.order);
+      const idx = siblings.findIndex(i=>i.id===itemId);
+      const swapIdx = idx+dir;
+      if(swapIdx<0 || swapIdx>=siblings.length) return;
+      const a = siblings[idx], b = siblings[swapIdx];
+      const tmp = a.order; a.order = b.order; b.order = tmp;
+      render();
+      await saveTemplate(state.type);
+    },
+
+    renderEmployeePageToDoc(doc, emp){
+      const tpl = state.templates[emp.formType] || [];
+      const cats = state.categories[emp.formType] || [];
+      const p = computeProgress(emp);
+      const so = emp.signOff || {pic:'', ttd:'', date:''};
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 14;
+
+      doc.setFillColor(34,38,44);
+      doc.rect(0,0,pageWidth,26,'F');
+      doc.setFillColor(255,255,255);
+      doc.roundedRect(marginX, 4, 18, 18, 2, 2, 'F');
+      try{ doc.addImage(LOGO_DATA_URI, 'PNG', marginX+1.5, 5.5, 15, 15); }catch(err){}
+      doc.setTextColor(255,255,255);
+      doc.setFont('helvetica','bold'); doc.setFontSize(12.5);
+      doc.text('PT TATALOGAM GROUP', marginX+23, 12);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+      doc.text('Human Capital Department', marginX+23, 17.5);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10);
+      doc.text(TYPES[emp.formType].full.toUpperCase(), pageWidth-marginX, 15, { align:'right', maxWidth: 90 });
+
+      let y = 36;
+
+      // Info box (4 rows tall: Nama/Posisi/Cabang/Info, Status/Progress on the right, no overlap)
+      const boxH = 34;
+      doc.setDrawColor(222,218,208); doc.setFillColor(247,245,240);
+      doc.roundedRect(marginX, y, pageWidth-marginX*2, boxH, 2, 2, 'FD');
+      doc.setTextColor(34,38,44);
+      doc.setFont('helvetica','bold'); doc.setFontSize(9);
+      const col2 = marginX + (pageWidth-marginX*2)/2 + 4;
+      doc.text('Nama', marginX+5, y+8); doc.text('Posisi', marginX+5, y+15); doc.text('Cabang', marginX+5, y+22);
+      doc.text('Status', col2, y+8); doc.text('Progress', col2, y+15);
+      doc.setFont('helvetica','normal');
+      doc.text(': ' + emp.name, marginX+22, y+8);
+      doc.text(': ' + emp.position, marginX+22, y+15);
+      doc.text(': ' + (emp.branch||'-'), marginX+22, y+22);
+      doc.text(': ' + (p.pct===100?'Selesai':'Berjalan'), col2+22, y+8);
+      doc.text(': ' + p.done + '/' + p.total + ' item (' + p.pct + '%)', col2+22, y+15);
+      doc.setDrawColor(222,218,208);
+      doc.line(marginX+5, y+26, pageWidth-marginX-5, y+26);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8);
+      doc.text('Info', marginX+5, y+31);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(90);
+      doc.text(': ' + metaLineForPdf(emp), marginX+18, y+31, { maxWidth: pageWidth-marginX*2-24 });
+      doc.setTextColor(0);
+      y += boxH + 7;
+
+      // Checklist table — kiri "Pertanyaan", kanan "Jawaban" (status + catatan digabung aman, tidak tertimpa)
+      const body = [];
+      let rowNo = 1;
+      cats.forEach(cat=>{
+        const items = tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order);
+        if(items.length===0) return;
+        body.push([{ content: cat.toUpperCase(), colSpan: 3, styles: { fillColor:[243,241,236], textColor:[91,101,114], fontStyle:'bold', fontSize:8 } }]);
+        items.forEach(it=>{
+          const st = emp.checklist[it.id] || { done:false, note:'' };
+          const jawaban = (st.done ? 'Selesai' : 'Belum dikerjakan') + (st.note ? ('\nCatatan: ' + st.note) : '');
+          body.push([ rowNo++, it.title, jawaban ]);
+        });
+      });
+
+      doc.autoTable({
+        startY: y,
+        head: [['No', 'Pertanyaan / Item Checklist', 'Jawaban']],
+        body: body,
+        theme: 'grid',
+        margin: { left: marginX, right: marginX, bottom: 20 },
+        headStyles: { fillColor:[34,38,44], textColor:255, fontSize:8.5, halign:'center' },
+        styles: { fontSize:8.5, cellPadding:3, lineColor:[222,218,208], textColor:[34,38,44], valign:'top' },
+        columnStyles: {
+          0: { cellWidth: 9, halign:'center', textColor:[91,101,114] },
+          1: { cellWidth: 'auto' },
+          2: { cellWidth: 46 },
+        },
+        didParseCell: function(data){
+          if(data.section==='body' && data.column.index===2 && typeof data.cell.raw==='string'){
+            if(data.cell.raw.indexOf('Selesai')===0){ data.cell.styles.textColor=[47,143,91]; }
+            else if(data.cell.raw.indexOf('Belum')===0){ data.cell.styles.textColor=[194,75,63]; }
+          }
+        },
+      });
+
+      let finalY = doc.lastAutoTable.finalY + 10;
+      if(finalY > pageHeight - 55){ doc.addPage(); finalY = 24; }
+
+      // Sign-off box
+      const signH = 42;
+      doc.setDrawColor(200); doc.setFillColor(255,255,255);
+      doc.roundedRect(marginX, finalY, pageWidth-marginX*2, signH, 2, 2, 'D');
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(34,38,44);
+      doc.text('PENGESAHAN FORMULIR', marginX+6, finalY+8);
+      doc.setFont('helvetica','normal'); doc.setFontSize(9);
+      doc.text('Nama PIC : ' + (so.pic || '________________________'), marginX+6, finalY+16);
+      doc.text('Tanggal   : ' + (so.date || '____________'), marginX+6, finalY+23);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+      doc.text('TTD', pageWidth-marginX-45, finalY+8);
+      doc.setDrawColor(200);
+      doc.rect(pageWidth-marginX-55, finalY+11, 50, 24);
+      if(so.ttd && so.ttd.indexOf('data:image')===0){
+        try{ doc.addImage(so.ttd, 'PNG', pageWidth-marginX-53, finalY+13, 46, 20); }catch(err){}
+      }
+    },
+
+    drawPdfFooter(doc){
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 14;
+      const pageCount = doc.internal.getNumberOfPages();
+      for(let i=1;i<=pageCount;i++){
+        doc.setPage(i);
+        doc.setDrawColor(220);
+        doc.line(marginX, pageHeight-14, pageWidth-marginX, pageHeight-14);
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(140);
+        doc.text('Dicetak otomatis — Sistem Checklist Digital Human Capital, PT Tatalogam Group', marginX, pageHeight-9);
+        doc.text('Halaman ' + i + ' / ' + pageCount, pageWidth-marginX, pageHeight-9, { align:'right' });
+        doc.setTextColor(0);
+      }
+    },
+
+    exportPDF(empId){
+      const emp = state.employees.find(e=>e.id===empId);
+      if(!emp || !window.jspdf){ showToast('Gagal export PDF'); return; }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      OCK.renderEmployeePageToDoc(doc, emp);
+      OCK.drawPdfFooter(doc);
+      doc.save((TYPES[emp.formType].label).replace(/\s+/g,'_') + '_' + emp.name.replace(/\s+/g,'_') + '.pdf');
+      showToast('PDF diunduh');
+    },
+
+    exportAllPDF(){
+      if(!window.jspdf){ showToast('Gagal export PDF'); return; }
+      if(state.employees.length===0){ showToast('Belum ada data sama sekali'); return; }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const order = ['onboarding','mutasi','resign'];
+      const sorted = state.employees.slice().sort((a,b)=>{
+        const ta = order.indexOf(a.formType), tb = order.indexOf(b.formType);
+        if(ta!==tb) return ta-tb;
+        return (a.createdAt||'').localeCompare(b.createdAt||'');
+      });
+      sorted.forEach((emp, idx)=>{
+        if(idx>0) doc.addPage();
+        OCK.renderEmployeePageToDoc(doc, emp);
+      });
+      OCK.drawPdfFooter(doc);
+      doc.save('Rekap_Semua_Checklist_HC_Tatalogam.pdf');
+      showToast('PDF gabungan (' + sorted.length + ' proses) diunduh');
+    },
+
+    exportExcelAll(){
+      const list = typedEmployees();
+      if(!window.XLSX || list.length===0){ showToast('Belum ada data untuk diexport'); return; }
+      const tpl = currentTemplate();
+      const cats = currentCategories();
+      const summary = list.map(emp=>{
+        const p = computeProgress(emp);
+        const so = emp.signOff || {pic:'', ttd:'', date:''};
+        return {
+          Nama: emp.name, Posisi: emp.position, Cabang: emp.branch||'-',
+          Info: metaLine(emp),
+          Status: p.pct===100?'Selesai':'Berjalan',
+          'Progress (%)': p.pct, 'Item Selesai': p.done, 'Total Item': p.total,
+          'Nama PIC': so.pic||'', 'TTD': so.ttd ? 'Sudah tanda tangan (lihat PDF)' : 'Belum', 'Tanggal Pengisian': so.date||''
+        };
+      });
+      const detail = [];
+      list.forEach(emp=>{
+        cats.forEach(cat=>{
+          tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order).forEach(it=>{
+            const st = emp.checklist[it.id] || {done:false, note:''};
+            detail.push({ Nama: emp.name, Kategori: cat, Item: it.title, Status: st.done?'Selesai':'Belum', Catatan: st.note||'' });
+          });
+        });
+      });
+      const wb = window.XLSX.utils.book_new();
+      window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(summary), 'Ringkasan');
+      window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(detail), 'Detail Item');
+      window.XLSX.writeFile(wb, TYPES[state.type].label.replace(/\s+/g,'_') + '_Tatalogam.xlsx');
+      showToast('Excel diunduh');
+    },
+  };
+
+  function metaLineForPdf(emp){
+    if(emp.formType==='onboarding') return 'Tanggal Mulai Kerja: ' + (emp.meta.startDate||'-');
+    if(emp.formType==='mutasi') return 'Jenis: ' + (emp.meta.changeType||'-') + '  |  Posisi Baru: ' + (emp.meta.newPosition||'-') + '  |  Efektif: ' + (emp.meta.effectiveDate||'-');
+    if(emp.formType==='resign') return 'Tanggal Resign: ' + (emp.meta.resignDate||'-') + '  |  Alasan: ' + (emp.meta.reason||'-');
+    return '';
+  }
+
+  window.OCK = OCK;
+  loadAll();
+})();
+</script>
+
+</body>
+</html>

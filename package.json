@@ -1,0 +1,9 @@
+{
+  "name": "checklist-hc-tatalogam",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Checklist digital Human Capital (Onboarding / Mutasi & Rotasi / Resign) - PT Tatalogam Group",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
