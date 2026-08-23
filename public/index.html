@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
@@ -26,7 +27,8 @@
   }
   .ock-header{ background:var(--ink); color:#fff; padding:18px 28px 0 28px; }
   .ock-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; display:flex; align-items:center; gap:10px; }
-  .ock-title .mark{ width:28px;height:28px;border-radius:7px;background:var(--safety);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:700;font-size:14px;transform:rotate(-4deg); }
+  .ock-title .mark{ width:30px;height:30px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:2px; }
+  .ock-title .mark img{ width:100%;height:100%;object-fit:contain; }
   .ock-sub{ font-size:11.5px;color:#9AA2AC;font-family:'IBM Plex Mono',monospace;margin:2px 0 14px 0; }
 
   .ock-type-switch{ display:flex; gap:6px; padding:0 28px 0 28px; }
@@ -39,6 +41,15 @@
   .ock-type-btn .t2{ font-size:13px;font-weight:700;margin-top:2px; }
   .ock-type-btn.active{ background:var(--card); color:var(--ink); }
   .ock-type-btn.active .t1{ color:var(--type-color, var(--safety-deep)); opacity:1; }
+
+  .ock-header-actions{ display:flex; justify-content:flex-end; padding:10px 28px 12px 28px; }
+  .ock-btn-export-all{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:11.5px;
+    padding:7px 13px; border-radius:7px; border:1px solid var(--safety);
+    background:rgba(240,169,7,0.12); color:var(--safety);
+    cursor:pointer;
+  }
+  .ock-btn-export-all:hover{ background:rgba(240,169,7,0.2); }
 
   .ock-tabs{ display:flex;gap:6px;padding:12px 28px 0 28px;border-bottom:1px solid var(--line);background:var(--card);flex-wrap:wrap; }
   .ock-tab{ font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;padding:9px 15px;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--steel);cursor:pointer;border-radius:7px 7px 0 0; }
@@ -169,6 +180,21 @@ const storage = {
   }
 };
 (function(){
+  const LOGO_URL = '/images/logo-tatalogam.png';
+  let LOGO_DATA_URI = null;
+  function loadLogoForPdf(){
+    fetch(LOGO_URL)
+      .then(r => r.blob())
+      .then(blob => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      }))
+      .then(dataUrl => { LOGO_DATA_URI = dataUrl; })
+      .catch(() => { /* logo optional in PDF if this fails */ });
+  }
+  loadLogoForPdf();
   const DEFAULT_CATEGORIES = ["Dokumen & Administrasi","Akses & Sistem","Perlengkapan Kerja","Orientasi & Proses Akhir"];
 
   const TYPES = {
@@ -306,10 +332,13 @@ const storage = {
     if(state.loading){ app.innerHTML = `<div class="ock-empty" style="padding:100px 20px;">Memuat data...</div>`; return; }
     let html = `
       <div class="ock-header">
-        <div class="ock-title"><span class="mark">HC</span>Checklist Digital Human Capital</div>
+        <div class="ock-title"><span class="mark"><img src="/images/logo-tatalogam.png" alt="Tatalogam Group" /></span>Checklist Digital Human Capital</div>
         <div class="ock-sub">PT TATALOGAM GROUP — 1 LINK, 3 JENIS PROSES</div>
         <div class="ock-type-switch">
           ${Object.keys(TYPES).map(k=>typeBtn(k)).join('')}
+        </div>
+        <div class="ock-header-actions">
+          <button class="ock-btn-export-all" onclick="OCK.exportAllPDF()">Export Semua sebagai PDF (Onboarding + Mutasi + Resign)</button>
         </div>
       </div>
       <div class="ock-tabs">
@@ -837,61 +866,155 @@ const storage = {
       await saveTemplate(state.type);
     },
 
+    renderEmployeePageToDoc(doc, emp){
+      const tpl = state.templates[emp.formType] || [];
+      const cats = state.categories[emp.formType] || [];
+      const p = computeProgress(emp);
+      const so = emp.signOff || {pic:'', ttd:'', date:''};
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 14;
+
+      doc.setFillColor(34,38,44);
+      doc.rect(0,0,pageWidth,26,'F');
+      doc.setFillColor(255,255,255);
+      doc.roundedRect(marginX, 4, 18, 18, 2, 2, 'F');
+      try{ doc.addImage(LOGO_DATA_URI, 'PNG', marginX+1.5, 5.5, 15, 15); }catch(err){}
+      doc.setTextColor(255,255,255);
+      doc.setFont('helvetica','bold'); doc.setFontSize(12.5);
+      doc.text('PT TATALOGAM GROUP', marginX+23, 12);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+      doc.text('Human Capital Department', marginX+23, 17.5);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10);
+      doc.text(TYPES[emp.formType].full.toUpperCase(), pageWidth-marginX, 15, { align:'right', maxWidth: 90 });
+
+      let y = 36;
+
+      // Info box (4 rows tall: Nama/Posisi/Cabang/Info, Status/Progress on the right, no overlap)
+      const boxH = 34;
+      doc.setDrawColor(222,218,208); doc.setFillColor(247,245,240);
+      doc.roundedRect(marginX, y, pageWidth-marginX*2, boxH, 2, 2, 'FD');
+      doc.setTextColor(34,38,44);
+      doc.setFont('helvetica','bold'); doc.setFontSize(9);
+      const col2 = marginX + (pageWidth-marginX*2)/2 + 4;
+      doc.text('Nama', marginX+5, y+8); doc.text('Posisi', marginX+5, y+15); doc.text('Cabang', marginX+5, y+22);
+      doc.text('Status', col2, y+8); doc.text('Progress', col2, y+15);
+      doc.setFont('helvetica','normal');
+      doc.text(': ' + emp.name, marginX+22, y+8);
+      doc.text(': ' + emp.position, marginX+22, y+15);
+      doc.text(': ' + (emp.branch||'-'), marginX+22, y+22);
+      doc.text(': ' + (p.pct===100?'Selesai':'Berjalan'), col2+22, y+8);
+      doc.text(': ' + p.done + '/' + p.total + ' item (' + p.pct + '%)', col2+22, y+15);
+      doc.setDrawColor(222,218,208);
+      doc.line(marginX+5, y+26, pageWidth-marginX-5, y+26);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8);
+      doc.text('Info', marginX+5, y+31);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(90);
+      doc.text(': ' + metaLineForPdf(emp), marginX+18, y+31, { maxWidth: pageWidth-marginX*2-24 });
+      doc.setTextColor(0);
+      y += boxH + 7;
+
+      // Checklist table — kiri "Pertanyaan", kanan "Jawaban" (status + catatan digabung aman, tidak tertimpa)
+      const body = [];
+      let rowNo = 1;
+      cats.forEach(cat=>{
+        const items = tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order);
+        if(items.length===0) return;
+        body.push([{ content: cat.toUpperCase(), colSpan: 3, styles: { fillColor:[243,241,236], textColor:[91,101,114], fontStyle:'bold', fontSize:8 } }]);
+        items.forEach(it=>{
+          const st = emp.checklist[it.id] || { done:false, note:'' };
+          const jawaban = (st.done ? 'Selesai' : 'Belum dikerjakan') + (st.note ? ('\nCatatan: ' + st.note) : '');
+          body.push([ rowNo++, it.title, jawaban ]);
+        });
+      });
+
+      doc.autoTable({
+        startY: y,
+        head: [['No', 'Pertanyaan / Item Checklist', 'Jawaban']],
+        body: body,
+        theme: 'grid',
+        margin: { left: marginX, right: marginX, bottom: 20 },
+        headStyles: { fillColor:[34,38,44], textColor:255, fontSize:8.5, halign:'center' },
+        styles: { fontSize:8.5, cellPadding:3, lineColor:[222,218,208], textColor:[34,38,44], valign:'top' },
+        columnStyles: {
+          0: { cellWidth: 9, halign:'center', textColor:[91,101,114] },
+          1: { cellWidth: 'auto' },
+          2: { cellWidth: 46 },
+        },
+        didParseCell: function(data){
+          if(data.section==='body' && data.column.index===2 && typeof data.cell.raw==='string'){
+            if(data.cell.raw.indexOf('Selesai')===0){ data.cell.styles.textColor=[47,143,91]; }
+            else if(data.cell.raw.indexOf('Belum')===0){ data.cell.styles.textColor=[194,75,63]; }
+          }
+        },
+      });
+
+      let finalY = doc.lastAutoTable.finalY + 10;
+      if(finalY > pageHeight - 55){ doc.addPage(); finalY = 24; }
+
+      // Sign-off box
+      const signH = 42;
+      doc.setDrawColor(200); doc.setFillColor(255,255,255);
+      doc.roundedRect(marginX, finalY, pageWidth-marginX*2, signH, 2, 2, 'D');
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(34,38,44);
+      doc.text('PENGESAHAN FORMULIR', marginX+6, finalY+8);
+      doc.setFont('helvetica','normal'); doc.setFontSize(9);
+      doc.text('Nama PIC : ' + (so.pic || '________________________'), marginX+6, finalY+16);
+      doc.text('Tanggal   : ' + (so.date || '____________'), marginX+6, finalY+23);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+      doc.text('TTD', pageWidth-marginX-45, finalY+8);
+      doc.setDrawColor(200);
+      doc.rect(pageWidth-marginX-55, finalY+11, 50, 24);
+      if(so.ttd && so.ttd.indexOf('data:image')===0){
+        try{ doc.addImage(so.ttd, 'PNG', pageWidth-marginX-53, finalY+13, 46, 20); }catch(err){}
+      }
+    },
+
+    drawPdfFooter(doc){
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 14;
+      const pageCount = doc.internal.getNumberOfPages();
+      for(let i=1;i<=pageCount;i++){
+        doc.setPage(i);
+        doc.setDrawColor(220);
+        doc.line(marginX, pageHeight-14, pageWidth-marginX, pageHeight-14);
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(140);
+        doc.text('Dicetak otomatis — Sistem Checklist Digital Human Capital, PT Tatalogam Group', marginX, pageHeight-9);
+        doc.text('Halaman ' + i + ' / ' + pageCount, pageWidth-marginX, pageHeight-9, { align:'right' });
+        doc.setTextColor(0);
+      }
+    },
+
     exportPDF(empId){
       const emp = state.employees.find(e=>e.id===empId);
       if(!emp || !window.jspdf){ showToast('Gagal export PDF'); return; }
-      const tpl = state.templates[emp.formType] || [];
-      const cats = state.categories[emp.formType] || [];
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      let y = 18;
-      doc.setFont('helvetica','bold'); doc.setFontSize(13);
-      doc.text(TYPES[emp.formType].full + ' — PT Tatalogam Group', 14, y); y+=8;
-      doc.setFontSize(9.5); doc.setFont('helvetica','normal');
-      doc.text('Nama: ' + emp.name, 14, y); y+=5.5;
-      doc.text('Posisi: ' + emp.position + (emp.branch? ('  |  Cabang: '+emp.branch):''), 14, y); y+=5.5;
-      doc.text(metaLineForPdf(emp), 14, y); y+=5.5;
-      const p = computeProgress(emp);
-      doc.text('Progress: ' + p.done + '/' + p.total + ' (' + p.pct + '%)  —  Status: ' + (p.pct===100?'Selesai':'Berjalan'), 14, y); y+=9;
-
-      CATS_LOOP: for (const cat of cats) {
-        const items = tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order);
-        if(items.length===0) continue;
-        if(y>265){ doc.addPage(); y=18; }
-        doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
-        doc.text(cat, 14, y); y+=6;
-        doc.setFont('helvetica','normal'); doc.setFontSize(9);
-        items.forEach(it=>{
-          const st = emp.checklist[it.id] || {done:false, note:''};
-          if(y>272){ doc.addPage(); y=18; }
-          const mark = st.done ? '[x]' : '[ ]';
-          doc.text(mark + ' ' + it.title, 16, y); y+=5;
-          if(st.note){ doc.setTextColor(110); doc.text('    Catatan: ' + st.note, 16, y); y+=5; doc.setTextColor(0); }
-        });
-        y+=4;
-      }
-
-      const so = emp.signOff || {pic:'', ttd:'', date:''};
-      if(y>230){ doc.addPage(); y=18; }
-      y+=6;
-      doc.setDrawColor(180); doc.line(14, y, 196, y); y+=8;
-      doc.setFont('helvetica','bold'); doc.setFontSize(10);
-      doc.text('Pengesahan Formulir', 14, y); y+=7;
-      doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
-      doc.text('Nama PIC: ' + (so.pic || '_______________________'), 14, y); y+=6.5;
-      doc.text('Tanggal Pengisian: ' + (so.date || '____________'), 14, y); y+=8;
-      doc.text('TTD:', 14, y);
-      if(so.ttd && so.ttd.indexOf('data:image')===0){
-        try{ doc.addImage(so.ttd, 'PNG', 14, y+3, 60, 22); }catch(err){}
-        y += 28;
-      }else{
-        doc.setDrawColor(150);
-        doc.line(30, y+2, 90, y+2);
-        y += 8;
-      }
-
+      OCK.renderEmployeePageToDoc(doc, emp);
+      OCK.drawPdfFooter(doc);
       doc.save((TYPES[emp.formType].label).replace(/\s+/g,'_') + '_' + emp.name.replace(/\s+/g,'_') + '.pdf');
       showToast('PDF diunduh');
+    },
+
+    exportAllPDF(){
+      if(!window.jspdf){ showToast('Gagal export PDF'); return; }
+      if(state.employees.length===0){ showToast('Belum ada data sama sekali'); return; }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const order = ['onboarding','mutasi','resign'];
+      const sorted = state.employees.slice().sort((a,b)=>{
+        const ta = order.indexOf(a.formType), tb = order.indexOf(b.formType);
+        if(ta!==tb) return ta-tb;
+        return (a.createdAt||'').localeCompare(b.createdAt||'');
+      });
+      sorted.forEach((emp, idx)=>{
+        if(idx>0) doc.addPage();
+        OCK.renderEmployeePageToDoc(doc, emp);
+      });
+      OCK.drawPdfFooter(doc);
+      doc.save('Rekap_Semua_Checklist_HC_Tatalogam.pdf');
+      showToast('PDF gabungan (' + sorted.length + ' proses) diunduh');
     },
 
     exportExcelAll(){
