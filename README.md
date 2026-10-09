@@ -50,3 +50,11 @@ netlify deploy --prod
 - Semua data (template checklist, kategori, data karyawan per proses, tanda tangan) tersimpan di satu Blob store bernama `checklist-hc-tatalogam`, sifatnya **shared** — semua orang yang buka link ini melihat data yang sama.
 - Kalau butuh membatasi siapa yang bisa akses (misal cuma tim HC), bisa tambahkan **Netlify Identity** atau proteksi password di menu Site settings → Access control setelah deploy.
 - Kalau mau reset semua data, tinggal hapus Blob store lewat Netlify Dashboard → Blobs, atau buat store baru dengan mengganti `STORE_NAME` di `netlify/functions/storage.js`.
+
+## Alur data (v2)
+
+- **Simpan Progress** → menyimpan draft, status tetap berjalan, bisa dilanjutkan nanti.
+- **Selesai** → mengunci versi final sebagai *Asli* (read-only).
+- **Buat Revisi** (wajib isi alasan) → draft baru dari versi terakhir; saat diselesaikan menjadi *Revisi 1, 2, ...*. Semua versi lama tetap bisa dilihat & diexport PDF.
+- Server menolak perubahan/pengurangan revisi yang sudah final (append-only).
+- Pembacaan data memakai `consistency: 'strong'` dan 1 request bulk (`/api/storage?bulk=1`).
