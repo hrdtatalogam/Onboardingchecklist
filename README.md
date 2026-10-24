@@ -50,3 +50,9 @@ netlify deploy --prod
 - Semua data (template checklist, kategori, data karyawan per proses, tanda tangan) tersimpan di satu Blob store bernama `checklist-hc-tatalogam`, sifatnya **shared** — semua orang yang buka link ini melihat data yang sama.
 - Kalau butuh membatasi siapa yang bisa akses (misal cuma tim HC), bisa tambahkan **Netlify Identity** atau proteksi password di menu Site settings → Access control setelah deploy.
 - Kalau mau reset semua data, tinggal hapus Blob store lewat Netlify Dashboard → Blobs, atau buat store baru dengan mengganti `STORE_NAME` di `netlify/functions/storage.js`.
+
+## Update tampilan & fitur (Okt 2026)
+
+- Gaya disamakan dengan mockup Form Penilaian Investigator (biru #0054a4, lime #9cc814, Montserrat + Source Sans 3).
+- Fitur baru: pencarian & filter, kartu ringkasan, badge H-/terlambat, edit data proses, buka kembali proses selesai, tombol Segarkan, dialog konfirmasi bergaya brand.
+- Kontrak API `/api/storage` tidak berubah, jadi backend lama tetap kompatibel.

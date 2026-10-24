@@ -3,1064 +3,1128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0054a4">
 <title>Checklist Digital Human Capital — PT Tatalogam Group</title>
-</head>
-<body style="margin:0;padding:24px;background:#EDEAE2;min-height:100vh;font-family:sans-serif;">
+<link rel="icon" href="/images/logo-tatalogam.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <style>
-  :root{
-    --ink:#22262C; --steel:#5B6572; --steel-light:#AEB6BF;
-    --paper:#F3F1EC; --card:#FFFFFF; --safety:#F0A907; --safety-deep:#B9790A;
-    --ok:#2F8F5B; --line:#DEDAD0; --danger:#C24B3F;
-  }
-  *{box-sizing:border-box;}
-  .ock-root{
-    font-family:'Inter',sans-serif; color:var(--ink); background:var(--paper);
-    background-image:linear-gradient(var(--line) 1px, transparent 1px),linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size:28px 28px; background-position:-1px -1px;
-    border-radius:14px; min-height:600px; overflow:hidden; border:1px solid var(--line);
-  }
-  .ock-header{ background:var(--ink); color:#fff; padding:18px 28px 0 28px; }
-  .ock-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; display:flex; align-items:center; gap:10px; }
-  .ock-title .mark{ width:30px;height:30px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:2px; }
-  .ock-title .mark img{ width:100%;height:100%;object-fit:contain; }
-  .ock-sub{ font-size:11.5px;color:#9AA2AC;font-family:'IBM Plex Mono',monospace;margin:2px 0 14px 0; }
+:root{
+  --blue:#0054a4; --blue-dk:#003b7a; --lime:#9cc814; --navy:#0b2a4a;
+  --bg:#eef3f9; --ink:#12263f; --muted:#5a6f88; --line:#e3ebf4;
+  --bd:#c4d3e6; --bd2:#b9cfe8; --soft:#f6faff;
+  --red:#c0392b; --red-bg:#fdeceb; --red-bd:#efc4bf;
+  --amber:#8a5200; --amber-bg:#fdf0d9;
+  --lime-bg:#e9f5c9; --lime-tx:#3d5a00; --info-bg:#dcebfb; --info-tx:#0b4a8f;
+  --sh:0 8px 30px rgba(0,60,120,.10); --sh-sm:0 4px 16px rgba(0,60,120,.07);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --fh:'Montserrat',system-ui,sans-serif;
+  --fb:'Source Sans 3',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--fb);min-height:100vh;display:flex;flex-direction:column}
+body.lock{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid rgba(0,84,164,.4);outline-offset:2px}
+[hidden]{display:none!important}
 
-  .ock-type-switch{ display:flex; gap:6px; padding:0 28px 0 28px; }
-  .ock-type-btn{
-    flex:1; text-align:left; padding:10px 14px; border-radius:9px 9px 0 0;
-    border:1px solid transparent; background:rgba(255,255,255,0.06); color:#C7CCD3;
-    cursor:pointer; font-family:'Space Grotesk',sans-serif;
-  }
-  .ock-type-btn .t1{ font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.06em;opacity:0.8; }
-  .ock-type-btn .t2{ font-size:13px;font-weight:700;margin-top:2px; }
-  .ock-type-btn.active{ background:var(--card); color:var(--ink); }
-  .ock-type-btn.active .t1{ color:var(--type-color, var(--safety-deep)); opacity:1; }
+/* ===== Topbar ===== */
+.topbar{background:#fff;border-bottom:4px solid var(--lime);position:relative;z-index:5}
+.topbar-in{max-width:1100px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px}
+.topbar img{height:56px;width:auto;display:block}
+.topbar .sep{width:1px;height:36px;background:#d5dfec}
+.topbar .label{font:700 13px var(--fh);letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
 
-  .ock-header-actions{ display:flex; justify-content:flex-end; padding:10px 28px 12px 28px; }
-  .ock-btn-export-all{
-    font-family:'Inter',sans-serif; font-weight:600; font-size:11.5px;
-    padding:7px 13px; border-radius:7px; border:1px solid var(--safety);
-    background:rgba(240,169,7,0.12); color:var(--safety);
-    cursor:pointer;
-  }
-  .ock-btn-export-all:hover{ background:rgba(240,169,7,0.2); }
+/* ===== Hero ===== */
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dk) 100%);color:#fff;padding:52px 20px 120px}
+.hero svg.swoosh{position:absolute;right:-20px;top:0;opacity:.95;pointer-events:none;animation:swoosh .9s var(--ease) both}
+.hero-in{position:relative;max-width:1100px;margin:0 auto}
+.chip{display:inline-block;background:var(--lime);color:var(--navy);font:800 12px var(--fh);letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+.hero h1{margin:16px 0 10px;font:800 40px/1.12 var(--fh);max-width:640px}
+.hero p{margin:0;max-width:560px;font-size:18px;color:#d6e6f7}
+.type-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:30px;max-width:820px}
+.tbtn{position:relative;text-align:left;padding:13px 16px 15px;border-radius:14px;border:1.5px solid rgba(255,255,255,.38);background:rgba(255,255,255,.08);color:#fff;transition:background .2s,transform .2s var(--ease),box-shadow .2s}
+.tbtn:hover{background:rgba(255,255,255,.17);transform:translateY(-2px)}
+.tbtn .t1{display:block;font:700 11px var(--fh);letter-spacing:.1em;text-transform:uppercase;opacity:.85}
+.tbtn .t2{display:block;font:800 16px/1.25 var(--fh);margin-top:3px}
+.tbtn .cnt{position:absolute;top:10px;right:12px;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:rgba(255,255,255,.2);font:800 12px/24px var(--fh);text-align:center}
+.tbtn.active{background:#fff;color:var(--navy);border-color:#fff;box-shadow:inset 0 -4px 0 var(--lime),0 10px 24px rgba(0,30,70,.28)}
+.tbtn.active .t1{color:var(--blue);opacity:1}
+.tbtn.active .cnt{background:var(--lime);color:var(--navy)}
 
-  .ock-tabs{ display:flex;gap:6px;padding:12px 28px 0 28px;border-bottom:1px solid var(--line);background:var(--card);flex-wrap:wrap; }
-  .ock-tab{ font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;padding:9px 15px;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--steel);cursor:pointer;border-radius:7px 7px 0 0; }
-  .ock-tab.active{ background:var(--paper); color:var(--ink); border-color:var(--line); position:relative; top:1px; }
-  .ock-body{ background:var(--card); padding:22px 28px 28px 28px; min-height:460px; }
+/* ===== Panel ===== */
+.main{flex:1;width:100%;max-width:1100px;margin:-64px auto 0;padding:0 20px 56px;position:relative}
+.panel{background:#fff;border-radius:18px;box-shadow:var(--sh);overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 28px;border-bottom:1px solid var(--line)}
+.tabs{display:inline-flex;gap:4px;padding:4px;background:var(--bg);border-radius:999px}
+.tab{border:0;background:transparent;color:var(--muted);font:700 13px var(--fh);padding:9px 18px;border-radius:999px;transition:background .2s,color .2s,box-shadow .2s}
+.tab:hover{color:var(--blue)}
+.tab.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(0,84,164,.3)}
+.head-actions{display:flex;gap:8px;flex-wrap:wrap}
+.panel-body{padding:28px;min-height:420px}
 
-  .ock-row-between{ display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px; }
-  .ock-h2{ font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16.5px; }
-  .ock-btn{ font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;padding:9px 15px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px; }
-  .ock-btn.ghost{ background:transparent;color:var(--ink);border:1px solid var(--line); }
-  .ock-btn.small{ padding:6px 10px;font-size:11.5px; }
-  .ock-btn.safety{ background:var(--safety);border-color:var(--safety-deep);color:var(--ink); }
-  .ock-btn.danger-ghost{ color:var(--danger);border-color:var(--danger);background:transparent; }
-  .ock-btn:disabled{ opacity:0.4;cursor:not-allowed; }
+/* ===== Buttons ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:700 13px var(--fh);color:var(--blue);background:#fff;border:1.5px solid var(--bd2);border-radius:9px;padding:9px 15px;transition:transform .15s var(--ease),background .2s,box-shadow .2s,border-color .2s}
+.btn:hover{background:var(--bg);border-color:var(--blue);transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.sm{padding:6px 12px;font-size:12.5px;border-radius:8px}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;border-radius:999px;padding:12px 22px;font-weight:800;font-size:14px}
+.btn.primary:hover{background:var(--blue-dk);border-color:var(--blue-dk);box-shadow:0 8px 20px rgba(0,84,164,.3)}
+.btn.primary .plus{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--lime);color:var(--navy);font-size:16px;line-height:1}
+.btn.lime{background:var(--lime);border-color:var(--lime);color:var(--navy);border-radius:999px;padding:12px 22px;font-weight:800;font-size:14px}
+.btn.lime:hover{background:#8bb511;border-color:#8bb511;box-shadow:0 8px 20px rgba(120,160,0,.35)}
+.btn.danger{color:var(--red);border-color:var(--red-bd);background:#fff}
+.btn.danger:hover{background:var(--red-bg);border-color:var(--red)}
+.btn.danger-solid{background:var(--red);border-color:var(--red);color:#fff;border-radius:999px;padding:12px 22px;font-size:14px}
+.btn.danger-solid:hover{background:#a93226;border-color:#a93226}
+.btn.icon{min-width:34px;min-height:34px;padding:0;font-size:14px;border-radius:8px;border-color:#c4d6ec}
 
-  .ock-empty{ text-align:center;padding:56px 20px;color:var(--steel); }
-  .ock-empty .big{ font-family:'Space Grotesk',sans-serif;font-size:14.5px;color:var(--ink);font-weight:600;margin-bottom:6px; }
+/* ===== Section header (numbered) ===== */
+.sec-h{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.sec-n{width:36px;height:36px;border-radius:10px;background:var(--blue);color:#fff;display:grid;place-items:center;font:800 16px var(--fh);flex-shrink:0}
+.sec-h h2,.h2{margin:0;font:800 20px var(--fh);color:var(--blue)}
+.sec-h .cnt{margin-left:auto;font:700 12px var(--fh);color:var(--blue);background:#e3eefb;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.sub{margin:2px 0 0;color:var(--muted);font-size:14px}
 
-  .ock-grid{ display:grid;grid-template-columns:repeat(auto-fill, minmax(240px,1fr));gap:13px; }
-  .ock-card{ border:1px solid var(--line);border-radius:10px;padding:15px;cursor:pointer;background:#fff;transition:box-shadow .15s, transform .15s; }
-  .ock-card:hover{ box-shadow:0 4px 14px rgba(34,38,44,0.09);transform:translateY(-1px); }
-  .ock-card-name{ font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14.5px; }
-  .ock-card-pos{ font-size:12px;color:var(--steel);margin-top:2px; }
-  .ock-card-meta{ font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--steel-light);margin-top:9px; }
-  .ock-progress-wrap{ margin-top:11px;height:6px;border-radius:4px;background:var(--paper);overflow:hidden;border:1px solid var(--line); }
-  .ock-progress-fill{ height:100%;background:var(--safety); }
-  .ock-progress-fill.done{ background:var(--ok); }
-  .ock-progress-label{ font-size:10.5px;color:var(--steel);margin-top:5px;font-family:'IBM Plex Mono',monospace; }
-  .ock-status-pill{ display:inline-block;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;font-family:'IBM Plex Mono',monospace; }
-  .ock-status-pill.progress{ background:#FDF1D6;color:var(--safety-deep); }
-  .ock-status-pill.done{ background:#E3F3EA;color:var(--ok); }
+/* ===== Stats ===== */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.stat{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:var(--sh-sm);border-top:4px solid var(--c,var(--blue))}
+.stat .k{font-size:13px;color:var(--muted);font-weight:600}
+.stat .v{font:800 28px var(--fh);color:var(--ink);line-height:1.2}
 
-  .ock-detail-header{ display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px dashed var(--line);padding-bottom:15px;margin-bottom:16px;flex-wrap:wrap;gap:14px; }
-  .ock-detail-meta-row{ font-size:12.5px;color:var(--steel);margin-top:4px; }
-  .ock-detail-meta-row b{ color:var(--ink); }
-  .ock-cat-block{ margin-bottom:20px; }
-  .ock-cat-title{ font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--steel);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line); }
-  .ock-item{ display:flex;gap:11px;align-items:flex-start;padding:10px 6px;border-radius:8px; }
-  .ock-item:hover{ background:var(--paper); }
-  .ock-stamp{ width:25px;height:25px;border-radius:50%;border:2px solid var(--steel-light);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:2px;font-size:13px;color:transparent;transition:transform .12s;background:#fff; }
-  .ock-stamp.checked{ border-color:var(--ok);color:var(--ok);transform:rotate(-9deg) scale(1.04);font-weight:700; }
-  .ock-item-title{ font-size:13px;font-weight:500; }
-  .ock-item-title.done{ color:var(--steel); }
-  .ock-item-note{ width:100%;margin-top:6px;font-size:12.5px;font-family:'Inter',sans-serif;border:1px solid var(--line);border-radius:6px;padding:6px 9px;background:#fff; }
-  .ock-item-note:focus{ outline:1.5px solid var(--safety); }
+/* ===== Toolbar ===== */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.toolbar .grow{flex:1}
+.inp,.sel{width:100%;border:1.5px solid var(--bd);border-radius:10px;padding:11px 14px;background:#fff;transition:border-color .2s,box-shadow .2s}
+.inp:focus,.sel:focus,.note:focus,.ta:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(0,84,164,.12)}
+.inp.invalid,.sel.invalid{border-color:var(--red);background:var(--red-bg)}
+.search{width:320px;max-width:100%}
+.sel.auto{width:auto;padding-right:30px}
 
-  .ock-admin-cat{ margin-bottom:18px; }
-  .ock-cat-mgmt{
-    border:1px solid var(--safety-deep); border-radius:10px; padding:14px 16px;
-    background:#FFFBF0;
-  }
-  .ock-admin-list{ display:flex;flex-direction:column;gap:8px; }
-  .ock-admin-row{ display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:#fff; }
-  .ock-admin-row input[type=text]{ flex:1;border:none;font-size:13px;font-family:'Inter',sans-serif;background:transparent; }
-  .ock-admin-row input[type=text]:focus{ outline:none; }
-  .ock-order-btns{ display:flex;flex-direction:column;gap:1px; }
-  .ock-order-btns button{ border:none;background:transparent;cursor:pointer;color:var(--steel-light);font-size:10px;line-height:1;padding:2px; }
-  .ock-order-btns button:hover{ color:var(--ink); }
+/* ===== Process cards ===== */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.pcard{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:18px;cursor:pointer;box-shadow:var(--sh-sm);transition:transform .2s var(--ease),box-shadow .2s,border-color .2s}
+.pcard:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,60,120,.14);border-color:var(--bd2)}
+.pcard-top{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pcard-name{font:800 17px/1.25 var(--fh);margin-top:12px;color:var(--ink)}
+.pcard-pos{font-size:14px;color:var(--muted);margin-top:2px}
+.pcard-foot{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:7px;font-weight:600}
+.pcard-foot b{font-family:var(--fh);color:var(--blue)}
+.pcard-meta{margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd);font-size:12.5px;color:var(--muted)}
+.bar{margin-top:14px;height:8px;border-radius:999px;background:var(--bg);overflow:hidden}
+.fill{display:block;height:100%;width:var(--w,0%);border-radius:999px;background:linear-gradient(90deg,var(--blue),#2f86d6);transition:width .6s var(--ease)}
+.fill.done{background:linear-gradient(90deg,var(--lime),#b6dc3c)}
 
-  .ock-modal-bg{ position:fixed;inset:0;background:rgba(34,38,44,0.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px; }
-  .ock-modal{ background:#fff;border-radius:12px;padding:24px;width:100%;max-width:440px;font-family:'Inter',sans-serif;max-height:85vh;overflow-y:auto; }
-  .ock-modal h3{ font-family:'Space Grotesk',sans-serif;margin:0 0 4px 0;font-size:16px; }
-  .ock-modal .modal-sub{ font-size:12px;color:var(--steel);margin-bottom:16px;font-family:'IBM Plex Mono',monospace; }
-  .ock-field{ margin-bottom:12px; }
-  .ock-field label{ font-size:12px;font-weight:600;color:var(--steel);display:block;margin-bottom:4px; }
-  .ock-field input, .ock-field select{ width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-size:13.5px;font-family:'Inter',sans-serif; }
-  .ock-modal-actions{ display:flex;justify-content:flex-end;gap:8px;margin-top:16px; }
+/* ===== Pills / badges ===== */
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font:700 11.5px var(--fh);letter-spacing:.02em;white-space:nowrap}
+.p-progress,.t-amber{background:var(--amber-bg);color:var(--amber)}
+.p-ready,.t-blue,.p-info{background:var(--info-bg);color:var(--info-tx)}
+.p-done,.t-lime{background:var(--lime-bg);color:var(--lime-tx)}
+.p-late{background:var(--red-bg);color:var(--red)}
+.p-soon{background:var(--amber-bg);color:var(--amber)}
 
-  table.ock-table{ width:100%;border-collapse:collapse;font-size:12.5px; }
-  table.ock-table th{ text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;color:var(--steel);border-bottom:1px solid var(--line);padding:8px 10px; }
-  table.ock-table td{ padding:9px 10px;border-bottom:1px solid var(--line); }
-  table.ock-table tr:hover td{ background:var(--paper); }
-  .ock-link-btn{ background:none;border:none;color:var(--safety-deep);font-weight:600;cursor:pointer;font-size:12px;padding:0; }
-  .ock-toast{ position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;z-index:60;font-family:'Inter',sans-serif; }
+/* ===== Table ===== */
+.tbl-wrap{overflow-x:auto;background:#fff;border-radius:14px;box-shadow:var(--sh-sm)}
+table.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+.tbl th{background:var(--blue);color:#fff;text-align:left;padding:12px;font:700 12px var(--fh);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.tbl td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:nth-child(even) td{background:#f8fafd}
+.tbl tbody tr{transition:background .15s}
+.tbl tbody tr:hover td{background:#eef5fd}
+.tbl .acts{display:flex;gap:6px;white-space:nowrap}
 
-  .ock-signoff{
-    margin-top:8px; border:1px dashed var(--steel-light); border-radius:10px;
-    padding:16px 18px; background:var(--paper);
-  }
-  .ock-signoff-title{
-    font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;
-    text-transform:uppercase;letter-spacing:0.06em;color:var(--steel);margin-bottom:12px;
-  }
-  .ock-signoff-grid{ display:grid;grid-template-columns:1fr 1fr;gap:16px; }
-  .ock-sigpad-wrap{ margin-top:14px; }
-  .ock-sigpad-wrap label{ font-size:11.5px;color:var(--steel);font-weight:600;display:block;margin-bottom:5px; }
-  .ock-sigpad-box{
-    position:relative; border:1.5px dashed var(--steel-light); border-radius:8px;
-    background:#fff; overflow:hidden; touch-action:none;
-  }
-  .ock-sigpad-box canvas{ display:block; width:100%; height:130px; cursor:crosshair; }
-  .ock-sigpad-placeholder{
-    position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center;
-    padding-bottom:10px; font-size:11px; color:var(--steel-light); font-family:'IBM Plex Mono',monospace;
-    pointer-events:none;
-  }
-  .ock-sigpad-actions{ display:flex; justify-content:flex-end; margin-top:6px; }
-  .ock-signoff-field label{ font-size:11.5px;color:var(--steel);font-weight:600;display:block;margin-bottom:5px; }
-  .ock-signoff-field input{ width:100%;padding:8px 10px;border:none;border-bottom:1.5px solid var(--steel-light);background:transparent;font-size:13.5px;font-family:'Inter',sans-serif; }
-  .ock-signoff-field input:focus{ outline:none;border-bottom-color:var(--safety-deep); }
-  .ock-signoff-hint{ font-size:10.5px;color:var(--steel-light);margin-top:3px; }
+/* ===== Empty / skeleton / error ===== */
+.empty{text-align:center;padding:56px 20px;color:var(--muted)}
+.empty svg{width:84px;height:84px;margin-bottom:10px}
+.empty .big{font:800 18px var(--fh);color:var(--ink);margin-bottom:4px}
+.empty .btn{margin-top:16px}
+.sk{border-radius:12px;background:linear-gradient(90deg,#e6eef8 25%,#f3f7fc 50%,#e6eef8 75%);background-size:200% 100%;animation:shimmer 1.3s infinite linear}
+.sk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-top:20px}
+
+/* ===== Detail ===== */
+.detail-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.save-state{font-size:13px;font-weight:700;color:var(--muted);transition:opacity .4s}
+.save-state.ok{color:var(--lime-tx)}
+.save-state.err{color:var(--red)}
+.dhead{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:20px 22px;border-radius:14px;background:var(--bg);margin-bottom:20px}
+.dhead h2{margin:8px 0 2px;font:800 24px var(--fh);color:var(--blue)}
+.dmeta{color:var(--muted);font-size:14.5px}
+.dmeta b{color:var(--ink)}
+.dprog{min-width:230px;text-align:right}
+.dprog .pct{font:800 34px/1 var(--fh);color:var(--ink);margin:8px 0 6px}
+.dprog .bar{margin-top:0;background:#fff}
+.dprog .cnt{font-size:13px;color:var(--muted);margin-top:6px;font-weight:600}
+.banner{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:12px;background:var(--lime-bg);color:var(--lime-tx);font-weight:700;margin-bottom:20px;animation:rise .4s var(--ease) both}
+.banner .ic{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--lime);color:var(--navy);flex-shrink:0}
+.cat{margin-bottom:26px}
+.item{display:grid;grid-template-columns:34px 1fr;gap:8px 14px;align-items:start;padding:14px 0;border-top:1px solid var(--line)}
+.stamp{width:30px;height:30px;border-radius:50%;border:2px solid var(--bd2);background:#fff;display:grid;place-items:center;padding:0;color:transparent;transition:background .2s,border-color .2s,transform .2s var(--ease)}
+.stamp:hover{border-color:var(--blue);transform:scale(1.08)}
+.stamp svg{width:16px;height:16px;stroke:currentColor;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:22;stroke-dashoffset:22;transition:stroke-dashoffset .3s var(--ease) .05s}
+.stamp.checked{background:var(--lime);border-color:var(--lime);color:var(--navy);animation:pop .35s var(--ease)}
+.stamp.checked svg{stroke-dashoffset:0}
+.item-title{font-weight:600;transition:color .2s}
+.item-title.done{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(90,111,136,.5)}
+.note{width:100%;margin-top:8px;font-size:14px;border:1.5px solid #d3dfee;border-radius:9px;padding:9px 12px;background:#f9fbfe;transition:border-color .2s,box-shadow .2s}
+.signoff{border-radius:14px;border:1.5px solid var(--line);padding:22px;margin-top:8px}
+.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.fld label,.lbl{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.req{color:var(--red)}
+.sigbox{position:relative;border:2px dashed #8fb0d6;border-radius:14px;background:var(--soft);overflow:hidden;touch-action:none}
+.sigbox canvas{display:block;width:100%;aspect-ratio:720/220;cursor:crosshair;touch-action:none}
+.sigbox .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8aa3c0;font-weight:600;pointer-events:none;transition:opacity .2s}
+.sigbox .ph.off{opacity:0}
+.dfoot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
+.dfoot .r{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ===== Admin ===== */
+.acard{background:#fff;border-radius:16px;padding:20px 24px;box-shadow:0 6px 22px rgba(0,60,120,.09);margin-bottom:18px;border-top:8px solid var(--blue)}
+.acard.plain{border-top:0;box-shadow:var(--sh-sm);border:1.5px solid var(--line)}
+.acard h3{margin:0 0 4px;font:800 16px var(--fh);color:var(--blue)}
+.alist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.arow{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid var(--line);border-left:6px solid var(--lime);border-radius:12px;background:#fff;transition:box-shadow .2s,border-color .2s}
+.arow:hover,.arow:focus-within{box-shadow:0 4px 14px rgba(0,60,120,.1)}
+.arow input[type=text]{flex:1;min-width:0;border:1.5px solid transparent;background:transparent;border-radius:8px;padding:8px 10px;font-weight:600;transition:border-color .2s,background .2s}
+.arow input[type=text]:hover{border-color:var(--line)}
+.arow input[type=text]:focus{outline:none;border-color:var(--blue);background:#fff}
+.arow .btns{display:flex;gap:4px}
+.arow .cnt{font:700 12px var(--fh);color:var(--blue);background:#e3eefb;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.addrow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.addrow .inp{flex:1;min-width:200px;padding:9px 12px;font-size:14px}
+.nodata{color:#8aa3c0;font-size:14px;padding:6px 2px}
+
+/* ===== Modal ===== */
+.mbg{position:fixed;inset:0;z-index:50;background:rgba(11,42,74,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fade .2s ease both}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,30,70,.35);animation:rise .3s var(--ease) both}
+.modal-h{padding:24px 26px 0}
+.modal-h h3{margin:0;font:800 20px var(--fh);color:var(--blue)}
+.modal-h p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.modal-b{padding:18px 26px 6px}
+.modal-b .fld{margin-bottom:14px}
+.modal-f{display:flex;justify-content:flex-end;gap:10px;padding:14px 26px 24px;flex-wrap:wrap}
+.err-msg{color:var(--red);font-size:13px;font-weight:600;margin-top:4px}
+
+/* ===== Toast ===== */
+#toast-root{position:fixed;left:0;right:0;bottom:22px;display:flex;justify-content:center;z-index:80;pointer-events:none;padding:0 16px}
+.toast{background:var(--navy);color:#fff;padding:12px 20px;border-radius:12px;border-left:5px solid var(--lime);font-weight:600;font-size:14.5px;box-shadow:0 12px 30px rgba(0,30,70,.35);animation:toastIn .3s var(--ease) both;max-width:560px}
+.toast.err{border-left-color:#e74c3c}
+.toast.out{animation:toastOut .25s ease both}
+
+/* ===== Footer ===== */
+.foot{background:var(--navy);color:#b9cde4;padding:24px 20px;text-align:center;font-size:13px;border-top:4px solid var(--lime)}
+
+/* ===== Animations ===== */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes grow{from{width:0}}
+@keyframes swoosh{from{opacity:0;transform:translateX(60px)}to{opacity:.95;transform:none}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(10px)}}
+.enter>*{animation:rise .45s var(--ease) both}
+.enter .stats>*,.enter .grid>*,.enter .cat,.enter .acard{animation:rise .5s var(--ease) both;animation-delay:calc(min(var(--i,0),9)*55ms)}
+.enter .fill{animation:grow .9s var(--ease) both;animation-delay:.2s}
+.hero .chip,.hero h1,.hero p,.type-switch{animation:rise .6s var(--ease) both}
+.hero h1{animation-delay:.08s}.hero p{animation-delay:.16s}.type-switch{animation-delay:.24s}
+
+/* ===== Responsive ===== */
+@media (max-width:860px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:720px){
+  .topbar img{height:46px}
+  .topbar .label{font-size:11px}
+  .hero{padding:30px 16px 96px}
+  .hero h1{font-size:26px}
+  .hero p{font-size:15px}
+  .hero svg.swoosh{width:200px;height:200px}
+  .type-switch{gap:8px;margin-top:22px}
+  .tbtn{padding:10px 12px 12px}
+  .tbtn .t1{display:none}
+  .tbtn .t2{font-size:13px;padding-right:22px}
+  .tbtn .cnt{top:8px;right:8px;min-width:20px;height:20px;line-height:20px;font-size:11px;padding:0 5px}
+  .main{padding:0 12px 40px;margin-top:-48px}
+  .panel-head{padding:14px 16px}
+  .tabs{width:100%}.tab{flex:1;padding:9px 6px;font-size:12.5px}
+  .head-actions{width:100%}.head-actions .btn{flex:1}
+  .panel-body{padding:18px 16px}
+  .search{width:100%}
+  .toolbar .btn.primary{width:100%}
+  .dprog{text-align:left;min-width:0;width:100%}
+  .sig-grid{grid-template-columns:1fr}
+  .dfoot .r,.dfoot .btn{width:100%}
+  .dfoot .r .btn{flex:1}
+  .arow{flex-wrap:wrap}
+  .arow input[type=text]{flex-basis:100%;order:3}
+  .modal-f .btn{flex:1}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;transition-duration:.01ms!important}
+}
 </style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in">
+  <img src="/images/logo-tatalogam.png" alt="Tatalogam Group">
+  <div class="sep"></div>
+  <div class="label">Checklist Digital Human Capital</div>
+</div></header>
 
-<div id="ock-app" class="ock-root"></div>
+<section class="hero">
+  <svg class="swoosh" width="520" height="360" viewBox="0 0 520 360" fill="none" aria-hidden="true">
+    <path d="M520 0 L520 360 L330 360 C380 250 440 130 520 60 Z" fill="#9cc814" opacity="0.9"/>
+    <path d="M520 90 L520 360 L420 360 C440 270 470 180 520 120 Z" fill="#fff" opacity="0.18"/>
+    <path d="M300 360 C330 240 400 120 520 20" stroke="#fff" stroke-width="10" opacity="0.14"/>
+  </svg>
+  <div class="hero-in">
+    <span class="chip">Tatalogam Group</span>
+    <h1>Checklist Digital Human Capital</h1>
+    <p>Pantau proses Onboarding, Mutasi &amp; Rotasi, dan Resign karyawan dalam satu tempat, lengkap dengan tanda tangan digital.</p>
+    <div class="type-switch" id="type-switch"></div>
+  </div>
+</section>
 
+<main class="main">
+  <div class="panel" id="panel">
+    <div class="panel-head" id="panel-head"></div>
+    <div class="panel-body" id="view"></div>
+  </div>
+</main>
+
+<footer class="foot">© Tatalogam Group · Checklist Digital Human Capital</footer>
+
+<div id="modal-root"></div>
+<div id="toast-root" aria-live="polite"></div>
+<noscript><p style="padding:20px;text-align:center">Aplikasi ini membutuhkan JavaScript.</p></noscript>
 <script>
+(function(){
+'use strict';
+const $ = (s,r)=>(r||document).querySelector(s);
+const $$ = (s,r)=>Array.from((r||document).querySelectorAll(s));
+
+/* ---------- Storage (kontrak /api/storage tidak berubah) ---------- */
+async function jsonOrThrow(res,msg){ if(!res.ok) throw new Error(msg); return res.json(); }
 const storage = {
   async get(key){
-    const res = await fetch('/api/storage?key=' + encodeURIComponent(key));
-    if(!res.ok) throw new Error('Gagal mengambil data');
-    const data = await res.json();
-    if(data.value === null || data.value === undefined) return null;
-    return { key, value: data.value };
+    const d = await jsonOrThrow(await fetch('/api/storage?key='+encodeURIComponent(key)),'Gagal mengambil data');
+    return (d.value===null||d.value===undefined) ? null : {key,value:d.value};
   },
-  async set(key, value){
-    const res = await fetch('/api/storage', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, value })
-    });
-    if(!res.ok) throw new Error('Gagal menyimpan data');
-    return { key, value };
+  async list(prefix){
+    const d = await jsonOrThrow(await fetch('/api/storage?prefix='+encodeURIComponent(prefix)),'Gagal mengambil daftar');
+    return Array.isArray(d.keys) ? d.keys : [];
+  },
+  async set(key,value){
+    await jsonOrThrow(await fetch('/api/storage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,value})}),'Gagal menyimpan data');
   },
   async delete(key){
-    const res = await fetch('/api/storage?key=' + encodeURIComponent(key), { method: 'DELETE' });
-    if(!res.ok) throw new Error('Gagal menghapus data');
-    return { key, deleted: true };
+    await jsonOrThrow(await fetch('/api/storage?key='+encodeURIComponent(key),{method:'DELETE'}),'Gagal menghapus data');
   }
 };
+
+/* ---------- Logo (rasio asli, untuk PDF) ---------- */
+const LOGO_URL = '/images/logo-tatalogam.png';
+const LOGO = {data:null, ratio:0.707};
 (function(){
-  const LOGO_URL = '/images/logo-tatalogam.png';
-  let LOGO_DATA_URI = null;
-  function loadLogoForPdf(){
-    fetch(LOGO_URL)
-      .then(r => r.blob())
-      .then(blob => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      }))
-      .then(dataUrl => { LOGO_DATA_URI = dataUrl; })
-      .catch(() => { /* logo optional in PDF if this fails */ });
-  }
-  loadLogoForPdf();
-  const DEFAULT_CATEGORIES = ["Dokumen & Administrasi","Akses & Sistem","Perlengkapan Kerja","Orientasi & Proses Akhir"];
-
-  const TYPES = {
-    onboarding: { label:'Onboarding', full:'Checklist Karyawan Baru (Onboarding)', color:'#B9790A', bg:'#FDF1D6' },
-    mutasi:     { label:'Mutasi & Rotasi', full:'Checklist Job Rotasi Karyawan (Mutasi / Promosi / Demosi)', color:'#3B6FA6', bg:'#E8EEF5' },
-    resign:     { label:'Resign', full:'Checklist Karyawan Resign', color:'#7B5EA7', bg:'#EFE9F5' },
-  };
-
-  const DEFAULT_TEMPLATES = {
-    onboarding: [
-      {title:"Tanda tangan kontrak PKWT", category:"Dokumen & Administrasi"},
-      {title:"Pengumpulan dokumen (KTP, NPWP, ijazah, rekening)", category:"Dokumen & Administrasi"},
-      {title:"Pendaftaran BPJS Ketenagakerjaan & Kesehatan", category:"Dokumen & Administrasi"},
-      {title:"Pembuatan akun Talenta (HRIS)", category:"Akses & Sistem"},
-      {title:"Pembuatan email perusahaan", category:"Akses & Sistem"},
-      {title:"Aktivasi akses WhatsApp HCM Chatbot", category:"Akses & Sistem"},
-      {title:"ID card & akses masuk kantor / cabang", category:"Perlengkapan Kerja"},
-      {title:"Perlengkapan kerja (laptop, APD, seragam)", category:"Perlengkapan Kerja"},
-      {title:"Company induction & pengenalan budaya kerja", category:"Orientasi & Proses Akhir"},
-      {title:"Pengenalan tim & job desk", category:"Orientasi & Proses Akhir"},
-      {title:"Pelatihan dasar K3 / ISO awareness", category:"Orientasi & Proses Akhir"},
-    ],
-    mutasi: [
-      {title:"Surat Keputusan (SK) Mutasi/Promosi/Demosi", category:"Dokumen & Administrasi"},
-      {title:"Update / addendum kontrak kerja", category:"Dokumen & Administrasi"},
-      {title:"Penyesuaian gaji & tunjangan (jika ada)", category:"Dokumen & Administrasi"},
-      {title:"Update data posisi di HRIS (Talenta)", category:"Akses & Sistem"},
-      {title:"Update akses sistem sesuai posisi baru", category:"Akses & Sistem"},
-      {title:"Update ID card / akses area kerja baru", category:"Perlengkapan Kerja"},
-      {title:"Serah terima tugas & tanggung jawab (handover)", category:"Orientasi & Proses Akhir"},
-      {title:"Informasi ke atasan lama & atasan baru", category:"Orientasi & Proses Akhir"},
-      {title:"Sosialisasi perubahan ke tim terkait", category:"Orientasi & Proses Akhir"},
-    ],
-    resign: [
-      {title:"Surat pengunduran diri diterima", category:"Dokumen & Administrasi"},
-      {title:"Perhitungan hak karyawan (pesangon, sisa cuti, dll)", category:"Dokumen & Administrasi"},
-      {title:"Surat Keterangan Kerja (jika diminta)", category:"Dokumen & Administrasi"},
-      {title:"Pelaporan WLKP/PHK ke Kementerian Ketenagakerjaan", category:"Dokumen & Administrasi"},
-      {title:"Nonaktifkan akun & akses sistem (Talenta, email)", category:"Akses & Sistem"},
-      {title:"Nonaktifkan akses WhatsApp HCM Chatbot", category:"Akses & Sistem"},
-      {title:"Pengembalian aset perusahaan (laptop, ID card, dll)", category:"Perlengkapan Kerja"},
-      {title:"Exit interview", category:"Orientasi & Proses Akhir"},
-      {title:"Clearance sheet ditandatangani semua pihak terkait", category:"Orientasi & Proses Akhir"},
-    ],
-  };
-
-  let state = {
-    type: 'onboarding',
-    tab: 'aktif',
-    templates: {},
-    categories: {},
-    employees: [],
-    activeId: null,
-    loading: true,
-    modal: null,
-    toast: null,
-  };
-
-  function uid(p){ return p + "_" + Math.random().toString(36).slice(2,9); }
-  function esc(s){ return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
-  function todayISO(){ return new Date().toISOString().slice(0,10); }
-
-  async function loadAll(){
-    state.templates = {};
-    state.categories = {};
-    for(const key of Object.keys(TYPES)){
-      try{
-        const catData = await storage.get('categories:'+key);
-        if(catData){ state.categories[key] = JSON.parse(catData.value); }
-        else{
-          state.categories[key] = DEFAULT_CATEGORIES.slice();
-          await storage.set('categories:'+key, JSON.stringify(state.categories[key]));
-        }
-      }catch(e){
-        state.categories[key] = DEFAULT_CATEGORIES.slice();
-      }
-      try{
-        const tpl = await storage.get('template:'+key);
-        if(tpl){ state.templates[key] = JSON.parse(tpl.value); }
-        else{
-          state.templates[key] = DEFAULT_TEMPLATES[key].map((t,i)=>({id:uid('itm'),title:t.title,category:t.category,order:i}));
-          await storage.set('template:'+key, JSON.stringify(state.templates[key]));
-        }
-      }catch(e){
-        state.templates[key] = DEFAULT_TEMPLATES[key].map((t,i)=>({id:uid('itm'),title:t.title,category:t.category,order:i}));
-      }
-    }
-    try{
-      const idx = await storage.get('employees-index');
-      const ids = idx ? JSON.parse(idx.value) : [];
-      const emps = [];
-      for(const id of ids){
-        try{ const rec = await storage.get('employee:'+id); if(rec) emps.push(JSON.parse(rec.value)); }catch(e){}
-      }
-      state.employees = emps.map(e=>{
-        if(!e.signOff) e.signOff = {pic:'', ttd:'', date:''};
-        if(e.signOff.name!==undefined && e.signOff.pic===undefined){ e.signOff = {pic:e.signOff.name||'', ttd:'', date:e.signOff.date||''}; }
-        return e;
-      });
-    }catch(e){ state.employees = []; }
-    state.loading = false;
-    render();
-  }
-
-  async function saveTemplate(type){ await storage.set('template:'+type, JSON.stringify(state.templates[type])); }
-  async function saveCategories(type){ await storage.set('categories:'+type, JSON.stringify(state.categories[type])); }
-  async function saveEmployee(emp){ await storage.set('employee:'+emp.id, JSON.stringify(emp)); }
-  async function saveIndex(){ await storage.set('employees-index', JSON.stringify(state.employees.map(e=>e.id))); }
-  async function deleteEmployeeStorage(id){ try{ await storage.delete('employee:'+id); }catch(e){} }
-
-  function showToast(msg){ state.toast = msg; render(); setTimeout(()=>{ state.toast=null; render(); }, 2200); }
-
-  function currentTemplate(){ return state.templates[state.type] || []; }
-  function currentCategories(){ return state.categories[state.type] || []; }
-  function typedEmployees(){ return state.employees.filter(e=>e.formType===state.type); }
-
-  function computeProgress(emp){
-    const tpl = state.templates[emp.formType] || [];
-    const total = tpl.length || 1;
-    const done = tpl.filter(it => emp.checklist[it.id] && emp.checklist[it.id].done).length;
-    return {done, total, pct: Math.round((done/total)*100)};
-  }
-
-  function metaLine(emp){
-    if(emp.formType==='onboarding') return 'Mulai kerja: ' + esc(emp.meta.startDate||'-');
-    if(emp.formType==='mutasi') return esc(emp.meta.changeType||'-') + ' → ' + esc(emp.meta.newPosition||'-') + ' · Efektif: ' + esc(emp.meta.effectiveDate||'-');
-    if(emp.formType==='resign') return 'Resign: ' + esc(emp.meta.resignDate||'-') + (emp.meta.reason? ' · '+esc(emp.meta.reason):'');
-    return '';
-  }
-
-  // ---------- RENDER ----------
-  function render(){
-    const app = document.getElementById('ock-app');
-    if(state.loading){ app.innerHTML = `<div class="ock-empty" style="padding:100px 20px;">Memuat data...</div>`; return; }
-    let html = `
-      <div class="ock-header">
-        <div class="ock-title"><span class="mark"><img src="/images/logo-tatalogam.png" alt="Tatalogam Group" /></span>Checklist Digital Human Capital</div>
-        <div class="ock-sub">PT TATALOGAM GROUP — 1 LINK, 3 JENIS PROSES</div>
-        <div class="ock-type-switch">
-          ${Object.keys(TYPES).map(k=>typeBtn(k)).join('')}
-        </div>
-        <div class="ock-header-actions">
-          <button class="ock-btn-export-all" onclick="OCK.exportAllPDF()">Export Semua sebagai PDF (Onboarding + Mutasi + Resign)</button>
-        </div>
-      </div>
-      <div class="ock-tabs">
-        ${tabBtn('aktif','Aktif')}
-        ${tabBtn('riwayat','Riwayat')}
-        ${tabBtn('admin','Panel Admin')}
-      </div>
-      <div class="ock-body">
-        ${state.tab==='aktif' ? renderAktif() : ''}
-        ${state.tab==='riwayat' ? renderRiwayat() : ''}
-        ${state.tab==='admin' ? renderAdmin() : ''}
-        ${state.activeId ? renderDetail() : ''}
-      </div>
-      ${state.modal==='new-employee' ? renderNewEmployeeModal() : ''}
-      ${state.toast ? `<div class="ock-toast">${esc(state.toast)}</div>` : ''}
-    `;
-    app.innerHTML = html;
-    if(state.activeId && !state.modal){
-      requestAnimationFrame(()=>setupSignaturePad(state.activeId));
-    }
-  }
-
-  function typeBtn(key){
-    const t = TYPES[key];
-    return `<button class="ock-type-btn ${state.type===key?'active':''}" style="--type-color:${t.color}" onclick="OCK.setType('${key}')">
-      <div class="t1">${key==='onboarding'?'01 · KARYAWAN BARU':key==='mutasi'?'02 · MUTASI/ROTASI':'03 · RESIGN'}</div>
-      <div class="t2">${t.label}</div>
-    </button>`;
-  }
-  function tabBtn(key,label){ return `<button class="ock-tab ${state.tab===key?'active':''}" onclick="OCK.setTab('${key}')">${label}</button>`; }
-
-  function renderAktif(){
-    if(state.activeId) return '';
-    const list = typedEmployees().filter(e=>e.status!=='selesai');
-    let body;
-    if(list.length===0){
-      body = `<div class="ock-empty"><div class="big">Belum ada proses ${esc(TYPES[state.type].label)} yang aktif</div>Buat proses baru untuk mulai checklist-nya.</div>`;
-    }else{
-      body = `<div class="ock-grid">${list.map(cardHtml).join('')}</div>`;
-    }
-    return `
-      <div class="ock-row-between">
-        <div class="ock-h2">${esc(TYPES[state.type].full)} <span style="color:var(--steel);font-weight:400;font-size:12.5px;">(${list.length} aktif)</span></div>
-        <button class="ock-btn safety" onclick="OCK.openNewEmployee()">+ Buat Proses Baru</button>
-      </div>
-      ${body}
-    `;
-  }
-
-  function cardHtml(emp){
-    const p = computeProgress(emp);
-    return `
-      <div class="ock-card" onclick="OCK.openDetail('${emp.id}')">
-        <span class="ock-status-pill ${p.pct===100?'done':'progress'}">${p.pct===100?'SELESAI':'BERJALAN'}</span>
-        <div class="ock-card-name" style="margin-top:8px;">${esc(emp.name)}</div>
-        <div class="ock-card-pos">${esc(emp.position)}${emp.branch? ' · '+esc(emp.branch):''}</div>
-        <div class="ock-progress-wrap"><div class="ock-progress-fill ${p.pct===100?'done':''}" style="width:${p.pct}%"></div></div>
-        <div class="ock-progress-label">${p.done}/${p.total} item · ${p.pct}%</div>
-        <div class="ock-card-meta">${metaLine(emp).toUpperCase()}</div>
-      </div>
-    `;
-  }
-
-  function renderRiwayat(){
-    if(state.activeId) return '';
-    const list = typedEmployees();
-    if(list.length===0){
-      return `<div class="ock-row-between"><div class="ock-h2">Riwayat — ${esc(TYPES[state.type].label)}</div></div>
-        <div class="ock-empty"><div class="big">Belum ada riwayat</div>Riwayat proses akan muncul di sini.</div>`;
-    }
-    const rows = list.map(emp=>{
-      const p = computeProgress(emp);
-      return `<tr>
-        <td>${esc(emp.name)}</td>
-        <td>${esc(emp.position)}</td>
-        <td>${esc(emp.branch||'-')}</td>
-        <td style="font-size:11.5px;">${metaLine(emp)}</td>
-        <td><span class="ock-status-pill ${p.pct===100?'done':'progress'}">${p.pct===100?'SELESAI':'BERJALAN'}</span></td>
-        <td>${p.done}/${p.total} (${p.pct}%)</td>
-        <td>
-          <button class="ock-link-btn" onclick="OCK.openDetail('${emp.id}')">Lihat</button> ·
-          <button class="ock-link-btn" onclick="OCK.exportPDF('${emp.id}')">PDF</button>
-        </td>
-      </tr>`;
-    }).join('');
-    return `
-      <div class="ock-row-between">
-        <div class="ock-h2">Riwayat — ${esc(TYPES[state.type].label)} <span style="color:var(--steel);font-weight:400;font-size:12.5px;">(${list.length})</span></div>
-        <button class="ock-btn ghost" onclick="OCK.exportExcelAll()">Export Excel (jenis ini)</button>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="ock-table">
-          <thead><tr><th>Nama</th><th>Posisi</th><th>Cabang</th><th>Info</th><th>Status</th><th>Progress</th><th>Aksi</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  function renderAdmin(){
-    if(state.activeId) return '';
-    const tpl = currentTemplate();
-    const cats = currentCategories();
-
-    const catMgmt = `
-      <div class="ock-cat-mgmt">
-        <div class="ock-cat-title" style="margin-bottom:10px;">Kelola Sub Pertanyaan / Kategori</div>
-        <div class="ock-admin-list">
-          ${cats.map((cat,idx)=>{
-            const count = tpl.filter(i=>i.category===cat).length;
-            return `
-              <div class="ock-admin-row">
-                <div class="ock-order-btns">
-                  <button onclick="OCK.moveCategory('${esc(cat)}',-1)" ${idx===0?'disabled':''}>▲</button>
-                  <button onclick="OCK.moveCategory('${esc(cat)}',1)" ${idx===cats.length-1?'disabled':''}>▼</button>
-                </div>
-                <input type="text" value="${esc(cat)}" onchange="OCK.renameCategory('${esc(cat)}', this.value)" />
-                <span style="font-size:11px;color:var(--steel-light);font-family:'IBM Plex Mono',monospace;white-space:nowrap;">${count} item</span>
-                <button class="ock-btn danger-ghost small" onclick="OCK.deleteCategory('${esc(cat)}')">Hapus</button>
-              </div>
-            `;
-          }).join('')}
-        </div>
-        <div style="margin-top:8px;">
-          <input type="text" id="new-cat-input" placeholder="Tambah kategori / sub pertanyaan baru..." style="width:68%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;font-family:'Inter',sans-serif;" />
-          <button class="ock-btn ghost small" onclick="OCK.addCategory('new-cat-input')">+ Tambah Kategori</button>
-        </div>
-      </div>
-    `;
-
-    const groups = cats.map(cat=>{
-      const items = tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order);
-      return `
-        <div class="ock-admin-cat">
-          <div class="ock-cat-title">${esc(cat)}</div>
-          <div class="ock-admin-list">
-            ${items.map((it,idx)=>`
-              <div class="ock-admin-row">
-                <div class="ock-order-btns">
-                  <button onclick="OCK.moveItem('${it.id}',-1)" ${idx===0?'disabled':''}>▲</button>
-                  <button onclick="OCK.moveItem('${it.id}',1)" ${idx===items.length-1?'disabled':''}>▼</button>
-                </div>
-                <input type="text" value="${esc(it.title)}" onchange="OCK.editItemTitle('${it.id}', this.value)" />
-                <button class="ock-btn danger-ghost small" onclick="OCK.deleteItem('${it.id}')">Hapus</button>
-              </div>
-            `).join('') || '<div style="color:var(--steel-light);font-size:12px;padding:6px 2px;">Belum ada item.</div>'}
-          </div>
-          <div style="margin-top:8px;">
-            <input type="text" id="new-item-${slug(cat)}" placeholder="Tambah item baru untuk ${esc(cat)}..." style="width:68%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;font-family:'Inter',sans-serif;" />
-            <button class="ock-btn ghost small" onclick="OCK.addItem('${esc(cat)}','new-item-${slug(cat)}')">+ Tambah</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-    return `
-      <div class="ock-row-between"><div class="ock-h2">Panel Admin — Template ${esc(TYPES[state.type].label)}</div></div>
-      <p style="color:var(--steel);font-size:12px;margin-top:-8px;margin-bottom:16px;">Setiap jenis proses (Onboarding / Mutasi / Resign) punya template checklist & kategori sendiri-sendiri. Perubahan di sini hanya berlaku untuk jenis <b>${esc(TYPES[state.type].label)}</b>.</p>
-      ${catMgmt}
-      <div style="height:1px;background:var(--line);margin:20px 0;"></div>
-      ${groups}
-    `;
-  }
-
-  function renderDetail(){
-    const emp = state.employees.find(e=>e.id===state.activeId);
-    if(!emp) return '';
-    const tpl = state.templates[emp.formType] || [];
-    const cats = state.categories[emp.formType] || [];
-    const p = computeProgress(emp);
-    const groups = cats.map(cat=>{
-      const items = tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order);
-      if(items.length===0) return '';
-      return `
-        <div class="ock-cat-block">
-          <div class="ock-cat-title">${esc(cat)}</div>
-          ${items.map(it=>{
-            const st = emp.checklist[it.id] || {done:false, note:''};
-            return `
-              <div class="ock-item">
-                <div class="ock-stamp ${st.done?'checked':''}" onclick="OCK.toggleItem('${emp.id}','${it.id}')">${st.done?'✓':''}</div>
-                <div style="flex:1;">
-                  <div class="ock-item-title ${st.done?'done':''}">${esc(it.title)}</div>
-                  <input class="ock-item-note" placeholder="Catatan (opsional)" value="${esc(st.note)}" onchange="OCK.setNote('${emp.id}','${it.id}', this.value)" />
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-    }).join('');
-
-    const so = emp.signOff || {pic:'', ttd:'', date:''};
-    const signoffBlock = `
-      <div class="ock-signoff">
-        <div class="ock-signoff-title">Pengesahan Formulir</div>
-        <div class="ock-signoff-grid">
-          <div class="ock-signoff-field">
-            <label>Nama PIC</label>
-            <input type="text" placeholder="Nama lengkap" value="${esc(so.pic)}" onchange="OCK.setSignOff('${emp.id}','pic', this.value)" />
-          </div>
-          <div class="ock-signoff-field">
-            <label>Tanggal Pengisian</label>
-            <input type="date" value="${esc(so.date)}" onchange="OCK.setSignOff('${emp.id}','date', this.value)" />
-          </div>
-        </div>
-        <div class="ock-sigpad-wrap">
-          <label>TTD (tanda tangan langsung di kotak ini)</label>
-          <div class="ock-sigpad-box">
-            <canvas id="sigpad-${emp.id}" width="600" height="160"></canvas>
-            ${so.ttd ? '' : '<div class="ock-sigpad-placeholder">tanda tangan di sini</div>'}
-          </div>
-          <div class="ock-sigpad-actions">
-            <button class="ock-btn ghost small" onclick="OCK.clearSignature('${emp.id}')">Bersihkan</button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    return `
-      <div>
-        <button class="ock-btn ghost small" onclick="OCK.closeDetail()">← Kembali</button>
-        <div class="ock-detail-header" style="margin-top:15px;">
-          <div>
-            <span class="ock-status-pill" style="background:${TYPES[emp.formType].bg};color:${TYPES[emp.formType].color};margin-bottom:6px;">${esc(TYPES[emp.formType].label).toUpperCase()}</span>
-            <div class="ock-h2" style="margin-top:6px;">${esc(emp.name)}</div>
-            <div class="ock-detail-meta-row"><b>${esc(emp.position)}</b>${emp.branch? ' · '+esc(emp.branch):''}</div>
-            <div class="ock-detail-meta-row">${metaLine(emp)}</div>
-          </div>
-          <div style="text-align:right;">
-            <span class="ock-status-pill ${p.pct===100?'done':'progress'}">${p.pct===100?'SELESAI':'BERJALAN'}</span>
-            <div class="ock-progress-wrap" style="width:150px;margin-top:8px;"><div class="ock-progress-fill ${p.pct===100?'done':''}" style="width:${p.pct}%"></div></div>
-            <div class="ock-progress-label">${p.done}/${p.total} item · ${p.pct}%</div>
-          </div>
-        </div>
-        ${groups}
-        ${signoffBlock}
-        <div class="ock-row-between" style="margin-top:16px;border-top:1px solid var(--line);padding-top:15px;">
-          <button class="ock-btn danger-ghost" onclick="OCK.deleteEmployee('${emp.id}')">Hapus Proses Ini</button>
-          <div style="display:flex;gap:8px;">
-            <button class="ock-btn ghost" onclick="OCK.exportPDF('${emp.id}')">Export PDF</button>
-            <button class="ock-btn safety" onclick="OCK.markDone('${emp.id}')" ${p.pct===100?'disabled':''}>Tandai Selesai</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function renderNewEmployeeModal(){
-    const type = state.type;
-    let extraFields = '';
-    if(type==='onboarding'){
-      extraFields = `<div class="ock-field"><label>Tanggal Mulai Kerja</label><input id="f-m1" type="date" /></div>`;
-    }else if(type==='mutasi'){
-      extraFields = `
-        <div class="ock-field"><label>Jenis Perubahan</label>
-          <select id="f-m1"><option value="Promosi">Promosi</option><option value="Demosi">Demosi</option><option value="Rotasi">Rotasi</option></select>
-        </div>
-        <div class="ock-field"><label>Posisi Baru</label><input id="f-m2" type="text" placeholder="cth. Supervisor Marketing" /></div>
-        <div class="ock-field"><label>Tanggal Efektif</label><input id="f-m3" type="date" /></div>
-      `;
-    }else if(type==='resign'){
-      extraFields = `
-        <div class="ock-field"><label>Tanggal Resign</label><input id="f-m1" type="date" /></div>
-        <div class="ock-field"><label>Alasan</label>
-          <select id="f-m2"><option value="Resign Pribadi">Resign Pribadi</option><option value="Kontrak Selesai">Kontrak Selesai</option><option value="PHK">PHK</option></select>
-        </div>
-      `;
-    }
-    return `
-      <div class="ock-modal-bg" onclick="if(event.target===this) OCK.closeModal()">
-        <div class="ock-modal">
-          <h3>Buat Proses Baru</h3>
-          <div class="modal-sub">${esc(TYPES[type].full)}</div>
-          <div class="ock-field"><label>Nama Karyawan</label><input id="f-name" type="text" placeholder="cth. Dewi Anggraini" /></div>
-          <div class="ock-field"><label>Posisi ${type==='mutasi'?'Saat Ini':''}</label><input id="f-pos" type="text" placeholder="cth. Staff Marketing" /></div>
-          <div class="ock-field"><label>Cabang</label><input id="f-branch" type="text" placeholder="cth. Jakarta Pusat" /></div>
-          ${extraFields}
-          <div class="ock-modal-actions">
-            <button class="ock-btn ghost" onclick="OCK.closeModal()">Batal</button>
-            <button class="ock-btn safety" onclick="OCK.createEmployee()">Buat Checklist</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function setupSignaturePad(empId){
-    const canvas = document.getElementById('sigpad-'+empId);
-    if(!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const emp = state.employees.find(e=>e.id===empId);
-    const so = emp && emp.signOff ? emp.signOff : {ttd:''};
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.strokeStyle = '#22262C';
-    ctx.lineWidth = 2.4;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    if(so.ttd){
-      const img = new Image();
-      img.onload = ()=>{ ctx.drawImage(img,0,0,canvas.width,canvas.height); };
-      img.src = so.ttd;
-    }
-
-    let drawing = false;
-    let last = null;
-
-    function posFromEvent(e){
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const point = e.touches ? e.touches[0] : e;
-      return { x: (point.clientX - rect.left) * scaleX, y: (point.clientY - rect.top) * scaleY };
-    }
-
-    function start(e){ e.preventDefault(); drawing = true; last = posFromEvent(e); }
-    function move(e){
-      if(!drawing) return;
-      e.preventDefault();
-      const p = posFromEvent(e);
-      ctx.beginPath();
-      ctx.moveTo(last.x, last.y);
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
-      last = p;
-    }
-    async function end(e){
-      if(!drawing) return;
-      drawing = false;
-      const dataUrl = canvas.toDataURL('image/png');
-      await OCK.setSignOff(empId, 'ttd', dataUrl);
-    }
-
-    canvas.addEventListener('mousedown', start);
-    canvas.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', end);
-    canvas.addEventListener('touchstart', start, {passive:false});
-    canvas.addEventListener('touchmove', move, {passive:false});
-    canvas.addEventListener('touchend', end);
-  }
-
-  // ---------- ACTIONS ----------
-  const OCK = {
-    setType(t){ state.type=t; state.tab='aktif'; state.activeId=null; render(); },
-    setTab(t){ state.tab=t; state.activeId=null; render(); },
-    openDetail(id){ state.activeId=id; render(); },
-    closeDetail(){ state.activeId=null; render(); },
-    openNewEmployee(){ state.modal='new-employee'; render(); },
-    closeModal(){ state.modal=null; render(); },
-
-    async createEmployee(){
-      const type = state.type;
-      const name = document.getElementById('f-name').value.trim();
-      const position = document.getElementById('f-pos').value.trim();
-      const branch = document.getElementById('f-branch').value.trim();
-      let meta = {};
-      if(type==='onboarding'){
-        const startDate = document.getElementById('f-m1').value;
-        if(!name||!position||!startDate){ showToast('Lengkapi nama, posisi, dan tanggal mulai'); return; }
-        meta = { startDate };
-      }else if(type==='mutasi'){
-        const changeType = document.getElementById('f-m1').value;
-        const newPosition = document.getElementById('f-m2').value.trim();
-        const effectiveDate = document.getElementById('f-m3').value;
-        if(!name||!position||!newPosition||!effectiveDate){ showToast('Lengkapi semua field wajib'); return; }
-        meta = { changeType, newPosition, effectiveDate };
-      }else if(type==='resign'){
-        const resignDate = document.getElementById('f-m1').value;
-        const reason = document.getElementById('f-m2').value;
-        if(!name||!position||!resignDate){ showToast('Lengkapi nama, posisi, dan tanggal resign'); return; }
-        meta = { resignDate, reason };
-      }
-      const emp = { id: uid('emp'), formType: type, name, position, branch, meta, createdAt: new Date().toISOString(), checklist:{}, signOff:{pic:'',ttd:'',date:''}, status:'in_progress' };
-      state.employees.unshift(emp);
-      state.modal = null;
-      render();
-      await saveEmployee(emp);
-      await saveIndex();
-      showToast('Proses untuk '+name+' dibuat');
-    },
-
-    async toggleItem(empId, itemId){
-      const emp = state.employees.find(e=>e.id===empId);
-      if(!emp) return;
-      const cur = emp.checklist[itemId] || {done:false, note:''};
-      cur.done = !cur.done;
-      emp.checklist[itemId] = cur;
-      render();
-      await saveEmployee(emp);
-    },
-
-    async setNote(empId, itemId, val){
-      const emp = state.employees.find(e=>e.id===empId);
-      if(!emp) return;
-      const cur = emp.checklist[itemId] || {done:false, note:''};
-      cur.note = val;
-      emp.checklist[itemId] = cur;
-      await saveEmployee(emp);
-    },
-
-    async setSignOff(empId, field, val){
-      const emp = state.employees.find(e=>e.id===empId);
-      if(!emp) return;
-      if(!emp.signOff) emp.signOff = {pic:'', ttd:'', date:''};
-      emp.signOff[field] = val;
-      await saveEmployee(emp);
-    },
-
-    async clearSignature(empId){
-      const emp = state.employees.find(e=>e.id===empId);
-      if(!emp) return;
-      if(!emp.signOff) emp.signOff = {pic:'', ttd:'', date:''};
-      emp.signOff.ttd = '';
-      await saveEmployee(emp);
-      render();
-    },
-
-    async markDone(empId){
-      const emp = state.employees.find(e=>e.id===empId);
-      if(!emp) return;
-      emp.status = 'selesai';
-      if(emp.signOff && !emp.signOff.date){ emp.signOff.date = todayISO(); }
-      render();
-      await saveEmployee(emp);
-      showToast('Ditandai selesai');
-    },
-
-    async deleteEmployee(empId){
-      if(!confirm('Hapus proses ini beserta riwayatnya?')) return;
-      state.employees = state.employees.filter(e=>e.id!==empId);
-      state.activeId = null;
-      render();
-      await deleteEmployeeStorage(empId);
-      await saveIndex();
-      showToast('Data dihapus');
-    },
-
-    async addCategory(inputId){
-      const el = document.getElementById(inputId);
-      const name = el.value.trim();
-      if(!name) return;
-      const cats = state.categories[state.type];
-      if(cats.includes(name)){ showToast('Kategori sudah ada'); return; }
-      cats.push(name);
-      render();
-      await saveCategories(state.type);
-      showToast('Kategori ditambahkan');
-    },
-
-    async renameCategory(oldName, newVal){
-      const newName = newVal.trim();
-      if(!newName || newName===oldName) { render(); return; }
-      const cats = state.categories[state.type];
-      const idx = cats.indexOf(oldName);
-      if(idx===-1) return;
-      if(cats.includes(newName)){ showToast('Nama kategori sudah dipakai'); render(); return; }
-      cats[idx] = newName;
-      const tpl = currentTemplate();
-      tpl.forEach(it=>{ if(it.category===oldName) it.category = newName; });
-      render();
-      await saveCategories(state.type);
-      await saveTemplate(state.type);
-      showToast('Kategori diubah');
-    },
-
-    async deleteCategory(name){
-      const tpl = currentTemplate();
-      const hasItems = tpl.some(it=>it.category===name);
-      if(hasItems){ showToast('Hapus/pindahkan item di kategori ini dulu sebelum menghapus kategorinya'); return; }
-      if(!confirm('Hapus kategori "'+name+'"?')) return;
-      state.categories[state.type] = state.categories[state.type].filter(c=>c!==name);
-      render();
-      await saveCategories(state.type);
-      showToast('Kategori dihapus');
-    },
-
-    async moveCategory(name, dir){
-      const cats = state.categories[state.type];
-      const idx = cats.indexOf(name);
-      const swapIdx = idx+dir;
-      if(idx===-1 || swapIdx<0 || swapIdx>=cats.length) return;
-      const tmp = cats[idx]; cats[idx] = cats[swapIdx]; cats[swapIdx] = tmp;
-      render();
-      await saveCategories(state.type);
-    },
-
-    async addItem(cat, inputId){
-      const el = document.getElementById(inputId);
-      const title = el.value.trim();
-      if(!title) return;
-      const tpl = currentTemplate();
-      const orders = tpl.filter(i=>i.category===cat).map(i=>i.order);
-      const nextOrder = orders.length? Math.max(...orders)+1 : 0;
-      tpl.push({id: uid('itm'), title, category: cat, order: nextOrder});
-      render();
-      await saveTemplate(state.type);
-      showToast('Item ditambahkan');
-    },
-
-    async editItemTitle(itemId, val){
-      const it = currentTemplate().find(i=>i.id===itemId);
-      if(!it) return;
-      it.title = val;
-      await saveTemplate(state.type);
-    },
-
-    async deleteItem(itemId){
-      if(!confirm('Hapus item checklist ini dari template?')) return;
-      state.templates[state.type] = currentTemplate().filter(i=>i.id!==itemId);
-      render();
-      await saveTemplate(state.type);
-    },
-
-    async moveItem(itemId, dir){
-      const tpl = currentTemplate();
-      const it = tpl.find(i=>i.id===itemId);
-      if(!it) return;
-      const siblings = tpl.filter(i=>i.category===it.category).sort((a,b)=>a.order-b.order);
-      const idx = siblings.findIndex(i=>i.id===itemId);
-      const swapIdx = idx+dir;
-      if(swapIdx<0 || swapIdx>=siblings.length) return;
-      const a = siblings[idx], b = siblings[swapIdx];
-      const tmp = a.order; a.order = b.order; b.order = tmp;
-      render();
-      await saveTemplate(state.type);
-    },
-
-    renderEmployeePageToDoc(doc, emp){
-      const tpl = state.templates[emp.formType] || [];
-      const cats = state.categories[emp.formType] || [];
-      const p = computeProgress(emp);
-      const so = emp.signOff || {pic:'', ttd:'', date:''};
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const marginX = 14;
-
-      doc.setFillColor(34,38,44);
-      doc.rect(0,0,pageWidth,26,'F');
-      doc.setFillColor(255,255,255);
-      doc.roundedRect(marginX, 4, 18, 18, 2, 2, 'F');
-      try{ doc.addImage(LOGO_DATA_URI, 'PNG', marginX+1.5, 5.5, 15, 15); }catch(err){}
-      doc.setTextColor(255,255,255);
-      doc.setFont('helvetica','bold'); doc.setFontSize(12.5);
-      doc.text('PT TATALOGAM GROUP', marginX+23, 12);
-      doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
-      doc.text('Human Capital Department', marginX+23, 17.5);
-      doc.setFont('helvetica','bold'); doc.setFontSize(10);
-      doc.text(TYPES[emp.formType].full.toUpperCase(), pageWidth-marginX, 15, { align:'right', maxWidth: 90 });
-
-      let y = 36;
-
-      // Info box (4 rows tall: Nama/Posisi/Cabang/Info, Status/Progress on the right, no overlap)
-      const boxH = 34;
-      doc.setDrawColor(222,218,208); doc.setFillColor(247,245,240);
-      doc.roundedRect(marginX, y, pageWidth-marginX*2, boxH, 2, 2, 'FD');
-      doc.setTextColor(34,38,44);
-      doc.setFont('helvetica','bold'); doc.setFontSize(9);
-      const col2 = marginX + (pageWidth-marginX*2)/2 + 4;
-      doc.text('Nama', marginX+5, y+8); doc.text('Posisi', marginX+5, y+15); doc.text('Cabang', marginX+5, y+22);
-      doc.text('Status', col2, y+8); doc.text('Progress', col2, y+15);
-      doc.setFont('helvetica','normal');
-      doc.text(': ' + emp.name, marginX+22, y+8);
-      doc.text(': ' + emp.position, marginX+22, y+15);
-      doc.text(': ' + (emp.branch||'-'), marginX+22, y+22);
-      doc.text(': ' + (p.pct===100?'Selesai':'Berjalan'), col2+22, y+8);
-      doc.text(': ' + p.done + '/' + p.total + ' item (' + p.pct + '%)', col2+22, y+15);
-      doc.setDrawColor(222,218,208);
-      doc.line(marginX+5, y+26, pageWidth-marginX-5, y+26);
-      doc.setFont('helvetica','bold'); doc.setFontSize(8);
-      doc.text('Info', marginX+5, y+31);
-      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(90);
-      doc.text(': ' + metaLineForPdf(emp), marginX+18, y+31, { maxWidth: pageWidth-marginX*2-24 });
-      doc.setTextColor(0);
-      y += boxH + 7;
-
-      // Checklist table — kiri "Pertanyaan", kanan "Jawaban" (status + catatan digabung aman, tidak tertimpa)
-      const body = [];
-      let rowNo = 1;
-      cats.forEach(cat=>{
-        const items = tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order);
-        if(items.length===0) return;
-        body.push([{ content: cat.toUpperCase(), colSpan: 3, styles: { fillColor:[243,241,236], textColor:[91,101,114], fontStyle:'bold', fontSize:8 } }]);
-        items.forEach(it=>{
-          const st = emp.checklist[it.id] || { done:false, note:'' };
-          const jawaban = (st.done ? 'Selesai' : 'Belum dikerjakan') + (st.note ? ('\nCatatan: ' + st.note) : '');
-          body.push([ rowNo++, it.title, jawaban ]);
-        });
-      });
-
-      doc.autoTable({
-        startY: y,
-        head: [['No', 'Pertanyaan / Item Checklist', 'Jawaban']],
-        body: body,
-        theme: 'grid',
-        margin: { left: marginX, right: marginX, bottom: 20 },
-        headStyles: { fillColor:[34,38,44], textColor:255, fontSize:8.5, halign:'center' },
-        styles: { fontSize:8.5, cellPadding:3, lineColor:[222,218,208], textColor:[34,38,44], valign:'top' },
-        columnStyles: {
-          0: { cellWidth: 9, halign:'center', textColor:[91,101,114] },
-          1: { cellWidth: 'auto' },
-          2: { cellWidth: 46 },
-        },
-        didParseCell: function(data){
-          if(data.section==='body' && data.column.index===2 && typeof data.cell.raw==='string'){
-            if(data.cell.raw.indexOf('Selesai')===0){ data.cell.styles.textColor=[47,143,91]; }
-            else if(data.cell.raw.indexOf('Belum')===0){ data.cell.styles.textColor=[194,75,63]; }
-          }
-        },
-      });
-
-      let finalY = doc.lastAutoTable.finalY + 10;
-      if(finalY > pageHeight - 55){ doc.addPage(); finalY = 24; }
-
-      // Sign-off box
-      const signH = 42;
-      doc.setDrawColor(200); doc.setFillColor(255,255,255);
-      doc.roundedRect(marginX, finalY, pageWidth-marginX*2, signH, 2, 2, 'D');
-      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(34,38,44);
-      doc.text('PENGESAHAN FORMULIR', marginX+6, finalY+8);
-      doc.setFont('helvetica','normal'); doc.setFontSize(9);
-      doc.text('Nama PIC : ' + (so.pic || '________________________'), marginX+6, finalY+16);
-      doc.text('Tanggal   : ' + (so.date || '____________'), marginX+6, finalY+23);
-      doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
-      doc.text('TTD', pageWidth-marginX-45, finalY+8);
-      doc.setDrawColor(200);
-      doc.rect(pageWidth-marginX-55, finalY+11, 50, 24);
-      if(so.ttd && so.ttd.indexOf('data:image')===0){
-        try{ doc.addImage(so.ttd, 'PNG', pageWidth-marginX-53, finalY+13, 46, 20); }catch(err){}
-      }
-    },
-
-    drawPdfFooter(doc){
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const marginX = 14;
-      const pageCount = doc.internal.getNumberOfPages();
-      for(let i=1;i<=pageCount;i++){
-        doc.setPage(i);
-        doc.setDrawColor(220);
-        doc.line(marginX, pageHeight-14, pageWidth-marginX, pageHeight-14);
-        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(140);
-        doc.text('Dicetak otomatis — Sistem Checklist Digital Human Capital, PT Tatalogam Group', marginX, pageHeight-9);
-        doc.text('Halaman ' + i + ' / ' + pageCount, pageWidth-marginX, pageHeight-9, { align:'right' });
-        doc.setTextColor(0);
-      }
-    },
-
-    exportPDF(empId){
-      const emp = state.employees.find(e=>e.id===empId);
-      if(!emp || !window.jspdf){ showToast('Gagal export PDF'); return; }
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      OCK.renderEmployeePageToDoc(doc, emp);
-      OCK.drawPdfFooter(doc);
-      doc.save((TYPES[emp.formType].label).replace(/\s+/g,'_') + '_' + emp.name.replace(/\s+/g,'_') + '.pdf');
-      showToast('PDF diunduh');
-    },
-
-    exportAllPDF(){
-      if(!window.jspdf){ showToast('Gagal export PDF'); return; }
-      if(state.employees.length===0){ showToast('Belum ada data sama sekali'); return; }
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const order = ['onboarding','mutasi','resign'];
-      const sorted = state.employees.slice().sort((a,b)=>{
-        const ta = order.indexOf(a.formType), tb = order.indexOf(b.formType);
-        if(ta!==tb) return ta-tb;
-        return (a.createdAt||'').localeCompare(b.createdAt||'');
-      });
-      sorted.forEach((emp, idx)=>{
-        if(idx>0) doc.addPage();
-        OCK.renderEmployeePageToDoc(doc, emp);
-      });
-      OCK.drawPdfFooter(doc);
-      doc.save('Rekap_Semua_Checklist_HC_Tatalogam.pdf');
-      showToast('PDF gabungan (' + sorted.length + ' proses) diunduh');
-    },
-
-    exportExcelAll(){
-      const list = typedEmployees();
-      if(!window.XLSX || list.length===0){ showToast('Belum ada data untuk diexport'); return; }
-      const tpl = currentTemplate();
-      const cats = currentCategories();
-      const summary = list.map(emp=>{
-        const p = computeProgress(emp);
-        const so = emp.signOff || {pic:'', ttd:'', date:''};
-        return {
-          Nama: emp.name, Posisi: emp.position, Cabang: emp.branch||'-',
-          Info: metaLine(emp),
-          Status: p.pct===100?'Selesai':'Berjalan',
-          'Progress (%)': p.pct, 'Item Selesai': p.done, 'Total Item': p.total,
-          'Nama PIC': so.pic||'', 'TTD': so.ttd ? 'Sudah tanda tangan (lihat PDF)' : 'Belum', 'Tanggal Pengisian': so.date||''
-        };
-      });
-      const detail = [];
-      list.forEach(emp=>{
-        cats.forEach(cat=>{
-          tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order).forEach(it=>{
-            const st = emp.checklist[it.id] || {done:false, note:''};
-            detail.push({ Nama: emp.name, Kategori: cat, Item: it.title, Status: st.done?'Selesai':'Belum', Catatan: st.note||'' });
-          });
-        });
-      });
-      const wb = window.XLSX.utils.book_new();
-      window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(summary), 'Ringkasan');
-      window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(detail), 'Detail Item');
-      window.XLSX.writeFile(wb, TYPES[state.type].label.replace(/\s+/g,'_') + '_Tatalogam.xlsx');
-      showToast('Excel diunduh');
-    },
-  };
-
-  function metaLineForPdf(emp){
-    if(emp.formType==='onboarding') return 'Tanggal Mulai Kerja: ' + (emp.meta.startDate||'-');
-    if(emp.formType==='mutasi') return 'Jenis: ' + (emp.meta.changeType||'-') + '  |  Posisi Baru: ' + (emp.meta.newPosition||'-') + '  |  Efektif: ' + (emp.meta.effectiveDate||'-');
-    if(emp.formType==='resign') return 'Tanggal Resign: ' + (emp.meta.resignDate||'-') + '  |  Alasan: ' + (emp.meta.reason||'-');
-    return '';
-  }
-
-  window.OCK = OCK;
-  loadAll();
+  fetch(LOGO_URL).then(r=>r.blob()).then(b=>new Promise((res,rej)=>{
+    const fr=new FileReader(); fr.onloadend=()=>res(fr.result); fr.onerror=rej; fr.readAsDataURL(b);
+  })).then(d=>{
+    LOGO.data=d; const im=new Image();
+    im.onload=()=>{ if(im.naturalHeight) LOGO.ratio=im.naturalWidth/im.naturalHeight; };
+    im.src=d;
+  }).catch(()=>{});
 })();
-</script>
 
+/* ---------- Konstanta ---------- */
+const DEFAULT_CATEGORIES = ["Dokumen & Administrasi","Akses & Sistem","Perlengkapan Kerja","Orientasi & Proses Akhir"];
+const TYPES = {
+  onboarding:{label:'Onboarding', full:'Checklist Karyawan Baru (Onboarding)', num:'01', sub:'Karyawan Baru', cls:'t-lime', dateKey:'startDate', dateLabel:'Mulai kerja'},
+  mutasi:{label:'Mutasi & Rotasi', full:'Checklist Job Rotasi Karyawan (Mutasi / Promosi / Demosi)', num:'02', sub:'Mutasi / Rotasi', cls:'t-blue', dateKey:'effectiveDate', dateLabel:'Efektif'},
+  resign:{label:'Resign', full:'Checklist Karyawan Resign', num:'03', sub:'Resign', cls:'t-amber', dateKey:'resignDate', dateLabel:'Resign'}
+};
+const DEFAULT_TEMPLATES = {
+  onboarding:[
+    {title:"Tanda tangan kontrak PKWT", category:"Dokumen & Administrasi"},
+    {title:"Pengumpulan dokumen (KTP, NPWP, ijazah, rekening)", category:"Dokumen & Administrasi"},
+    {title:"Pendaftaran BPJS Ketenagakerjaan & Kesehatan", category:"Dokumen & Administrasi"},
+    {title:"Pembuatan akun Talenta (HRIS)", category:"Akses & Sistem"},
+    {title:"Pembuatan email perusahaan", category:"Akses & Sistem"},
+    {title:"Aktivasi akses WhatsApp HCM Chatbot", category:"Akses & Sistem"},
+    {title:"ID card & akses masuk kantor / cabang", category:"Perlengkapan Kerja"},
+    {title:"Perlengkapan kerja (laptop, APD, seragam)", category:"Perlengkapan Kerja"},
+    {title:"Company induction & pengenalan budaya kerja", category:"Orientasi & Proses Akhir"},
+    {title:"Pengenalan tim & job desk", category:"Orientasi & Proses Akhir"},
+    {title:"Pelatihan dasar K3 / ISO awareness", category:"Orientasi & Proses Akhir"}
+  ],
+  mutasi:[
+    {title:"Surat Keputusan (SK) Mutasi/Promosi/Demosi", category:"Dokumen & Administrasi"},
+    {title:"Update / addendum kontrak kerja", category:"Dokumen & Administrasi"},
+    {title:"Penyesuaian gaji & tunjangan (jika ada)", category:"Dokumen & Administrasi"},
+    {title:"Update data posisi di HRIS (Talenta)", category:"Akses & Sistem"},
+    {title:"Update akses sistem sesuai posisi baru", category:"Akses & Sistem"},
+    {title:"Update ID card / akses area kerja baru", category:"Perlengkapan Kerja"},
+    {title:"Serah terima tugas & tanggung jawab (handover)", category:"Orientasi & Proses Akhir"},
+    {title:"Informasi ke atasan lama & atasan baru", category:"Orientasi & Proses Akhir"},
+    {title:"Sosialisasi perubahan ke tim terkait", category:"Orientasi & Proses Akhir"}
+  ],
+  resign:[
+    {title:"Surat pengunduran diri diterima", category:"Dokumen & Administrasi"},
+    {title:"Perhitungan hak karyawan (pesangon, sisa cuti, dll)", category:"Dokumen & Administrasi"},
+    {title:"Surat Keterangan Kerja (jika diminta)", category:"Dokumen & Administrasi"},
+    {title:"Pelaporan WLKP/PHK ke Kementerian Ketenagakerjaan", category:"Dokumen & Administrasi"},
+    {title:"Nonaktifkan akun & akses sistem (Talenta, email)", category:"Akses & Sistem"},
+    {title:"Nonaktifkan akses WhatsApp HCM Chatbot", category:"Akses & Sistem"},
+    {title:"Pengembalian aset perusahaan (laptop, ID card, dll)", category:"Perlengkapan Kerja"},
+    {title:"Exit interview", category:"Orientasi & Proses Akhir"},
+    {title:"Clearance sheet ditandatangani semua pihak terkait", category:"Orientasi & Proses Akhir"}
+  ]
+};
+
+/* ---------- State ---------- */
+const state = {
+  type:'onboarding', tab:'aktif', templates:{}, categories:{}, employees:[],
+  activeId:null, loading:true, loadError:null, modal:null, confirm:null,
+  q:'', fs:'all'
+};
+let lastViewKey = '', lastLoad = 0;
+
+/* ---------- Helpers ---------- */
+function uid(p){ return p+'_'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3); }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const BULAN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function parseISO(s){ const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(s||''); return m?new Date(+m[1],+m[2]-1,+m[3]):null; }
+function fmtDate(s){ const d=parseISO(s); return d?(d.getDate()+' '+BULAN[d.getMonth()]+' '+d.getFullYear()):(s||'-'); }
+function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysFromToday(s){ const d=parseISO(s); if(!d) return null; return Math.round((d-parseISO(todayISO()))/86400000); }
+function getEmp(id){ return state.employees.find(e=>e.id===id); }
+function curTpl(){ return state.templates[state.type]||[]; }
+function curCats(){ return state.categories[state.type]||[]; }
+function typedEmployees(){ return state.employees.filter(e=>e.formType===state.type); }
+function sortedItems(tpl,cat){ return tpl.filter(i=>i.category===cat).sort((a,b)=>a.order-b.order); }
+
+function computeProgress(emp){
+  const tpl=state.templates[emp.formType]||[];
+  const total=tpl.length||1;
+  const done=tpl.filter(it=>emp.checklist[it.id]&&emp.checklist[it.id].done).length;
+  return {done,total,pct:Math.round(done/total*100)};
+}
+function statusOf(emp){
+  if(emp.status==='selesai') return {key:'done',label:'SELESAI'};
+  if(computeProgress(emp).pct===100) return {key:'ready',label:'SIAP DISELESAIKAN'};
+  return {key:'progress',label:'BERJALAN'};
+}
+function metaText(emp){
+  const m=emp.meta||{};
+  if(emp.formType==='onboarding') return 'Mulai kerja: '+fmtDate(m.startDate);
+  if(emp.formType==='mutasi') return (m.changeType||'-')+' → '+(m.newPosition||'-')+' · Efektif: '+fmtDate(m.effectiveDate);
+  if(emp.formType==='resign') return 'Resign: '+fmtDate(m.resignDate)+(m.reason?' · '+m.reason:'');
+  return '';
+}
+function dueBadge(emp){
+  if(emp.status==='selesai') return '';
+  const t=TYPES[emp.formType]; const raw=(emp.meta||{})[t.dateKey];
+  const d=daysFromToday(raw); if(d===null) return '';
+  const label = d>0?('H-'+d):d===0?'Hari H':('Lewat '+(-d)+' hari');
+  const cls = d<0?'p-late':d<=3?'p-soon':'p-info';
+  return `<span class="pill ${cls}" title="${esc(t.dateLabel+': '+fmtDate(raw))}">${esc(label)}</span>`;
+}
+function needsAttention(emp){
+  if(emp.status==='selesai') return false;
+  const d=daysFromToday((emp.meta||{})[TYPES[emp.formType].dateKey]);
+  return d!==null && d<=3;
+}
+function matches(emp){
+  const q=state.q.trim().toLowerCase();
+  if(!q) return true;
+  return [emp.name,emp.position,emp.branch,metaText(emp)].join(' ').toLowerCase().includes(q);
+}
+
+/* ---------- Toast & indikator simpan ---------- */
+let toastTimer;
+function toast(msg,kind){
+  const root=$('#toast-root');
+  root.innerHTML=`<div class="toast ${kind==='error'?'err':''}" role="status">${esc(msg)}</div>`;
+  const el=root.firstElementChild;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),260); }, kind==='error'?4800:2400);
+}
+let saveTimer;
+function setSaveState(text,cls){
+  const el=$('#save-state'); if(!el) return;
+  el.textContent=text; el.className='save-state '+(cls||''); el.style.opacity=1;
+  clearTimeout(saveTimer);
+  if(cls==='ok') saveTimer=setTimeout(()=>{ const e=$('#save-state'); if(e) e.style.opacity=0; },2000);
+}
+
+/* ---------- Persistensi ---------- */
+const saveQueue={};
+function saveEmployee(emp){
+  setSaveState('Menyimpan…','');
+  const p=(saveQueue[emp.id]||Promise.resolve()).catch(()=>{}).then(()=>storage.set('employee:'+emp.id,JSON.stringify(emp)));
+  saveQueue[emp.id]=p;
+  p.then(()=>setSaveState('✓ Tersimpan','ok')).catch(()=>{ setSaveState('Gagal menyimpan','err'); toast('Gagal menyimpan. Periksa koneksi, lalu coba lagi.','error'); });
+  return p;
+}
+function saveIndex(){ return storage.set('employees-index',JSON.stringify(state.employees.map(e=>e.id))); }
+function saveTemplate(type){ return storage.set('template:'+type,JSON.stringify(state.templates[type])); }
+function saveCategories(type){ return storage.set('categories:'+type,JSON.stringify(state.categories[type])); }
+async function guard(fn,okMsg){
+  try{ await fn(); if(okMsg) toast(okMsg); return true; }
+  catch(e){ toast('Gagal menyimpan. Periksa koneksi, lalu coba lagi.','error'); return false; }
+}
+
+/* ---------- Load data ---------- */
+function normalizeEmp(e){
+  e.checklist=e.checklist||{}; e.meta=e.meta||{};
+  if(!e.signOff) e.signOff={pic:'',ttd:'',date:''};
+  if(e.signOff.name!==undefined && e.signOff.pic===undefined) e.signOff={pic:e.signOff.name||'',ttd:'',date:e.signOff.date||''};
+  return e;
+}
+async function loadAll(silent){
+  if(!silent){ state.loading=true; state.loadError=null; render(); }
+  try{
+    // Jangan pernah jatuh ke template bawaan saat gagal fetch: itu bisa menimpa data asli. Gagal = tampilkan error.
+    const templates={}, categories={};
+    await Promise.all(Object.keys(TYPES).map(async key=>{
+      const [cat,tpl]=await Promise.all([storage.get('categories:'+key),storage.get('template:'+key)]);
+      if(cat){ categories[key]=JSON.parse(cat.value); }
+      else{ categories[key]=DEFAULT_CATEGORIES.slice(); await saveCategories2(key,categories[key]); }
+      if(tpl){ templates[key]=JSON.parse(tpl.value); }
+      else{
+        templates[key]=DEFAULT_TEMPLATES[key].map((t,i)=>({id:uid('itm'),title:t.title,category:t.category,order:i}));
+        await storage.set('template:'+key,JSON.stringify(templates[key]));
+      }
+    }));
+    const ids=new Set();
+    try{ (await storage.list('employee:')).forEach(k=>ids.add(k.replace(/^employee:/,''))); }catch(e){}
+    try{ const idx=await storage.get('employees-index'); if(idx) JSON.parse(idx.value).forEach(i=>ids.add(i)); }catch(e){}
+    const recs=await Promise.all(Array.from(ids).map(id=>storage.get('employee:'+id)));
+    const emps=[];
+    recs.forEach(r=>{ if(!r) return; try{ const e=JSON.parse(r.value); if(e&&e.id) emps.push(normalizeEmp(e)); }catch(e){} });
+    emps.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+    state.templates=templates; state.categories=categories; state.employees=emps;
+    state.loading=false; state.loadError=null; lastLoad=Date.now();
+    render();
+    return true;
+  }catch(err){
+    if(!silent){ state.loading=false; state.loadError=err.message||'Gagal memuat data'; render(); }
+    return false;
+  }
+}
+function saveCategories2(key,val){ return storage.set('categories:'+key,JSON.stringify(val)); }
+
+/* ---------- Render: shell ---------- */
+function renderChrome(){
+  $('#type-switch').innerHTML=Object.keys(TYPES).map(k=>{
+    const t=TYPES[k];
+    const n=state.employees.filter(e=>e.formType===k&&e.status!=='selesai').length;
+    return `<button type="button" class="tbtn ${state.type===k?'active':''}" data-act="setType" data-key="${k}" aria-pressed="${state.type===k}">
+      <span class="t1">${t.num} · ${esc(t.sub)}</span><span class="t2">${esc(t.label)}</span>
+      ${state.loading?'':`<span class="cnt" title="Proses aktif">${n}</span>`}</button>`;
+  }).join('');
+  const tabs=[['aktif','Aktif'],['riwayat','Riwayat'],['admin','Panel Admin']];
+  $('#panel-head').innerHTML=`<div class="tabs" role="tablist">${tabs.map(([k,l])=>
+    `<button type="button" role="tab" aria-selected="${state.tab===k}" class="tab ${state.tab===k?'active':''}" data-act="setTab" data-key="${k}">${l}</button>`).join('')}</div>
+    <div class="head-actions">
+      <button type="button" class="btn sm" data-act="refresh">↻ Segarkan</button>
+      <button type="button" class="btn sm" data-act="exportAll">Export semua (PDF)</button>
+    </div>`;
+}
+function render(){
+  renderChrome();
+  const view=$('#view');
+  if(state.loading){ view.innerHTML=skeletonHtml(); renderModals(); return; }
+  if(state.loadError){ view.innerHTML=errorHtml(); renderModals(); return; }
+  if(state.activeId && !getEmp(state.activeId)) state.activeId=null;
+  const key=state.type+'|'+state.tab+'|'+(state.activeId||'');
+  const entering=key!==lastViewKey; lastViewKey=key;
+  const inner = state.activeId ? detailHtml(getEmp(state.activeId))
+    : state.tab==='aktif' ? aktifHtml() : state.tab==='riwayat' ? riwayatHtml() : adminHtml();
+  view.innerHTML=`<div class="view-inner${entering?' enter':''}">${inner}</div>`;
+  if(entering){
+    const vi=view.firstElementChild; setTimeout(()=>vi&&vi.classList.remove('enter'),1300);
+    countUp();
+    const top=$('#panel').getBoundingClientRect().top;
+    if(state.activeId && top<0) $('#panel').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  if(state.activeId) setupSignaturePad(getEmp(state.activeId));
+  renderModals();
+}
+function countUp(){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  $$('[data-count]').forEach(el=>{
+    const to=+el.dataset.count, suf=el.dataset.suf||''; if(!to){ return; }
+    const t0=performance.now(), dur=700;
+    (function step(t){ const p=Math.min(1,(t-t0)/dur); el.textContent=Math.round(to*(1-Math.pow(1-p,3)))+suf; if(p<1) requestAnimationFrame(step); })(t0);
+  });
+}
+function skeletonHtml(){
+  return `<div class="stats">${'<div class="sk" style="height:84px"></div>'.repeat(4)}</div>
+    <div class="sk" style="height:44px;max-width:320px"></div>
+    <div class="sk-grid">${'<div class="sk" style="height:178px"></div>'.repeat(3)}</div>`;
+}
+function errorHtml(){
+  return `<div class="empty">${emptyIcon()}<div class="big">Data belum bisa dimuat</div>
+    <div>${esc(state.loadError)}. Periksa koneksi internet, lalu coba lagi.</div>
+    <button type="button" class="btn primary" data-act="retry">Coba lagi</button></div>`;
+}
+function emptyIcon(){
+  return `<svg viewBox="0 0 84 84" fill="none" aria-hidden="true"><rect x="16" y="10" width="52" height="64" rx="8" fill="#e6eef8"/><rect x="30" y="5" width="24" height="12" rx="5" fill="#0054a4"/><path d="M28 36h28M28 48h28M28 60h16" stroke="#8fb0d6" stroke-width="4" stroke-linecap="round"/><circle cx="64" cy="62" r="13" fill="#9cc814"/><path d="M58 62l4 4 8-9" stroke="#0b2a4a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+/* ---------- Render: Aktif ---------- */
+function statsHtml(all){
+  const active=all.filter(e=>e.status!=='selesai');
+  const items=[
+    ['Total proses',all.length,'var(--blue)'],
+    ['Berjalan',active.length,'var(--lime)'],
+    ['Selesai',all.length-active.length,'#4a90d9'],
+    ['Perlu perhatian',active.filter(needsAttention).length,'#e0a030']
+  ];
+  return `<div class="stats">${items.map((s,i)=>`<div class="stat" style="--c:${s[2]};--i:${i}"><div class="k">${s[0]}</div><div class="v" data-count="${s[1]}">${s[1]}</div></div>`).join('')}</div>`;
+}
+function cardHtml(emp,i){
+  const p=computeProgress(emp), st=statusOf(emp);
+  return `<article class="pcard" style="--i:${i}" tabindex="0" role="button" data-act="openDetail" data-id="${esc(emp.id)}" aria-label="Buka checklist ${esc(emp.name)}">
+    <div class="pcard-top"><span class="pill p-${st.key}">${st.label}</span>${dueBadge(emp)}</div>
+    <div class="pcard-name">${esc(emp.name)}</div>
+    <div class="pcard-pos">${esc(emp.position)}${emp.branch?' · '+esc(emp.branch):''}</div>
+    <div class="bar"><i class="fill ${p.pct===100?'done':''}" style="--w:${p.pct}%"></i></div>
+    <div class="pcard-foot"><span>${p.done}/${p.total} item</span><b>${p.pct}%</b></div>
+    <div class="pcard-meta">${esc(metaText(emp))}</div></article>`;
+}
+function aktifListHtml(){
+  const active=typedEmployees().filter(e=>e.status!=='selesai');
+  const list=active.filter(matches);
+  if(!active.length) return `<div class="empty">${emptyIcon()}<div class="big">Belum ada proses ${esc(TYPES[state.type].label)} yang aktif</div>Buat proses baru untuk mulai checklist-nya.<br><button type="button" class="btn primary" data-act="openNew"><span class="plus">+</span>Buat Proses Baru</button></div>`;
+  if(!list.length) return `<div class="empty"><div class="big">Tidak ada hasil untuk “${esc(state.q)}”</div><button type="button" class="btn" data-act="clearSearch">Hapus pencarian</button></div>`;
+  return `<div class="grid">${list.map(cardHtml).join('')}</div>`;
+}
+function aktifHtml(){
+  const all=typedEmployees();
+  return `${statsHtml(all)}
+    <div class="toolbar">
+      <input id="q" class="inp search" type="search" placeholder="Cari nama, posisi, cabang…" aria-label="Cari" value="${esc(state.q)}">
+      <span class="grow"></span>
+      <button type="button" class="btn primary" data-act="openNew"><span class="plus">+</span>Buat Proses Baru</button>
+    </div>
+    <div id="list">${aktifListHtml()}</div>`;
+}
+
+/* ---------- Render: Riwayat ---------- */
+function riwayatListHtml(){
+  const all=typedEmployees();
+  const list=all.filter(matches).filter(e=>state.fs==='all'||(state.fs==='selesai'?e.status==='selesai':e.status!=='selesai'));
+  if(!all.length) return `<div class="empty">${emptyIcon()}<div class="big">Belum ada riwayat</div>Riwayat proses akan muncul di sini.</div>`;
+  if(!list.length) return `<div class="empty"><div class="big">Tidak ada data yang cocok</div><button type="button" class="btn" data-act="clearSearch">Reset filter</button></div>`;
+  const rows=list.map(emp=>{
+    const p=computeProgress(emp), st=statusOf(emp);
+    return `<tr>
+      <td><strong>${esc(emp.name)}</strong></td>
+      <td>${esc(emp.position)}${emp.branch?'<br><span style="color:var(--muted);font-size:13px">'+esc(emp.branch)+'</span>':''}</td>
+      <td style="font-size:13px">${esc(metaText(emp))}</td>
+      <td><span class="pill p-${st.key}">${st.label}</span></td>
+      <td style="white-space:nowrap">${p.done}/${p.total} (${p.pct}%)</td>
+      <td><div class="acts"><button type="button" class="btn sm" data-act="openDetail" data-id="${esc(emp.id)}">Lihat</button><button type="button" class="btn sm" data-act="exportPDF" data-id="${esc(emp.id)}">PDF</button><button type="button" class="btn sm danger" data-act="deleteEmp" data-id="${esc(emp.id)}">Hapus</button></div></td></tr>`;
+  }).join('');
+  return `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nama</th><th>Posisi · Cabang</th><th>Info</th><th>Status</th><th>Progres</th><th>Aksi</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function riwayatHtml(){
+  const n=typedEmployees().length;
+  return `<div class="toolbar">
+      <div><h2 class="h2">Riwayat — ${esc(TYPES[state.type].label)}</h2><p class="sub">${n} proses tercatat</p></div>
+      <span class="grow"></span>
+      <button type="button" class="btn" data-act="exportExcel">Export Excel (jenis ini)</button>
+    </div>
+    <div class="toolbar">
+      <input id="q" class="inp search" type="search" placeholder="Cari nama, posisi, cabang…" aria-label="Cari" value="${esc(state.q)}">
+      <select id="fs" class="sel auto" aria-label="Filter status" data-change="setFs">
+        ${[['all','Semua status'],['berjalan','Berjalan'],['selesai','Selesai']].map(([v,l])=>`<option value="${v}" ${state.fs===v?'selected':''}>${l}</option>`).join('')}
+      </select>
+    </div>
+    <div id="list">${riwayatListHtml()}</div>`;
+}
+
+/* ---------- Render: Admin ---------- */
+function adminHtml(){
+  const tpl=curTpl(), cats=curCats(), label=TYPES[state.type].label;
+  const catRows=cats.map((cat,ci)=>{
+    const count=tpl.filter(i=>i.category===cat).length;
+    return `<div class="arow">
+      <div class="btns"><button type="button" class="btn icon" data-act="moveCat" data-ci="${ci}" data-dir="-1" aria-label="Naik" ${ci===0?'disabled':''}>↑</button><button type="button" class="btn icon" data-act="moveCat" data-ci="${ci}" data-dir="1" aria-label="Turun" ${ci===cats.length-1?'disabled':''}>↓</button></div>
+      <input type="text" value="${esc(cat)}" aria-label="Nama kategori" data-change="renameCat" data-ci="${ci}">
+      <span class="cnt">${count} item</span>
+      <button type="button" class="btn icon danger" data-act="delCat" data-ci="${ci}" aria-label="Hapus kategori">✕</button></div>`;
+  }).join('');
+  const groups=cats.map((cat,ci)=>{
+    const items=sortedItems(tpl,cat);
+    return `<section class="acard plain" style="--i:${ci+1}">
+      <div class="sec-h"><span class="sec-n">${ci+1}</span><h3 style="font-size:17px">${esc(cat)}</h3></div>
+      <div class="alist">${items.map((it,idx)=>`<div class="arow">
+        <div class="btns"><button type="button" class="btn icon" data-act="moveItem" data-id="${esc(it.id)}" data-dir="-1" aria-label="Naik" ${idx===0?'disabled':''}>↑</button><button type="button" class="btn icon" data-act="moveItem" data-id="${esc(it.id)}" data-dir="1" aria-label="Turun" ${idx===items.length-1?'disabled':''}>↓</button></div>
+        <input type="text" value="${esc(it.title)}" aria-label="Judul item" data-change="editItem" data-id="${esc(it.id)}">
+        <button type="button" class="btn icon danger" data-act="delItem" data-id="${esc(it.id)}" aria-label="Hapus item">✕</button></div>`).join('')||'<div class="nodata">Belum ada item.</div>'}</div>
+      <div class="addrow"><input class="inp" type="text" id="new-item-${ci}" placeholder="Tambah item baru untuk ${esc(cat)}…" data-enter="addItem" data-ci="${ci}"><button type="button" class="btn" data-act="addItem" data-ci="${ci}">+ Tambah</button></div></section>`;
+  }).join('');
+  return `<h2 class="h2">Panel Admin — Template ${esc(label)}</h2>
+    <p class="sub" style="margin-bottom:20px">Setiap jenis proses punya template & kategori sendiri. Perubahan di sini hanya berlaku untuk <b>${esc(label)}</b> dan langsung tersimpan.</p>
+    <section class="acard" style="--i:0"><h3>Kelola kategori</h3><p class="sub">Ubah nama langsung di kolom, atur urutan dengan ↑ ↓.</p>
+      <div class="alist">${catRows||'<div class="nodata">Belum ada kategori.</div>'}</div>
+      <div class="addrow"><input class="inp" type="text" id="new-cat" placeholder="Tambah kategori baru…" data-enter="addCat"><button type="button" class="btn" data-act="addCat">+ Tambah Kategori</button></div></section>
+    ${groups}`;
+}
+
+/* ---------- Render: Detail ---------- */
+function checkSvg(){ return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'; }
+function bannerHtml(emp){
+  const p=computeProgress(emp);
+  if(emp.status==='selesai') return `<div class="banner" style="background:var(--info-bg);color:var(--info-tx)"><span class="ic">✓</span>Proses ini sudah ditandai selesai.</div>`;
+  if(p.pct===100) return `<div class="banner"><span class="ic">✓</span>Semua item sudah selesai. Klik “Tandai Selesai” untuk menutup proses ini.</div>`;
+  return '';
+}
+function summaryHtml(emp){
+  const p=computeProgress(emp), st=statusOf(emp);
+  return `<span class="pill p-${st.key}" id="d-status">${st.label}</span>
+    <div class="pct" id="d-pct">${p.pct}%</div>
+    <div class="bar"><i class="fill ${p.pct===100?'done':''}" id="d-fill" style="--w:${p.pct}%"></i></div>
+    <div class="cnt" id="d-cnt">${p.done}/${p.total} item selesai</div>`;
+}
+function detailHtml(emp){
+  const tpl=state.templates[emp.formType]||[], cats=state.categories[emp.formType]||[];
+  const t=TYPES[emp.formType];
+  let n=0;
+  const groups=cats.map(cat=>{
+    const items=sortedItems(tpl,cat); if(!items.length) return '';
+    n++;
+    const doneN=items.filter(it=>emp.checklist[it.id]&&emp.checklist[it.id].done).length;
+    return `<section class="cat" style="--i:${n}">
+      <div class="sec-h"><span class="sec-n">${n}</span><h2>${esc(cat)}</h2><span class="cnt" data-catcount="${esc(cat)}">${doneN}/${items.length}</span></div>
+      ${items.map(it=>{
+        const st=emp.checklist[it.id]||{done:false,note:''};
+        return `<div class="item" data-item="${esc(it.id)}">
+          <button type="button" class="stamp ${st.done?'checked':''}" role="checkbox" aria-checked="${!!st.done}" aria-label="Selesai: ${esc(it.title)}" data-act="toggleItem" data-emp="${esc(emp.id)}" data-id="${esc(it.id)}">${checkSvg()}</button>
+          <div><div class="item-title ${st.done?'done':''}">${esc(it.title)}</div>
+          <input class="note" type="text" placeholder="Catatan (opsional)" aria-label="Catatan: ${esc(it.title)}" value="${esc(st.note)}" data-change="setNote" data-emp="${esc(emp.id)}" data-id="${esc(it.id)}"></div></div>`;
+      }).join('')}</section>`;
+  }).join('') || `<div class="empty"><div class="big">Template masih kosong</div>Tambahkan item di Panel Admin.</div>`;
+  const so=emp.signOff;
+  const isDone=emp.status==='selesai';
+  return `<div class="detail-top"><button type="button" class="btn" data-act="closeDetail">← Kembali</button><span id="save-state" class="save-state" role="status" style="opacity:0"></span></div>
+    <div class="dhead"><div>
+        <span class="pill ${t.cls}">${esc(t.label).toUpperCase()}</span>
+        <h2>${esc(emp.name)}</h2>
+        <div class="dmeta"><b>${esc(emp.position)}</b>${emp.branch?' · '+esc(emp.branch):''}</div>
+        <div class="dmeta" style="margin-top:2px">${esc(metaText(emp))} ${dueBadge(emp)}</div>
+      </div><div class="dprog" id="d-summary">${summaryHtml(emp)}</div></div>
+    <div id="d-banner">${bannerHtml(emp)}</div>
+    ${groups}
+    <section class="signoff"><div class="sec-h"><span class="sec-n">${n+1}</span><h2>Pengesahan formulir</h2></div>
+      <div class="sig-grid">
+        <div class="fld"><label for="so-pic">Nama PIC</label><input id="so-pic" class="inp" type="text" placeholder="Nama lengkap" value="${esc(so.pic)}" data-change="setSign" data-field="pic" data-emp="${esc(emp.id)}"></div>
+        <div class="fld"><label for="so-date">Tanggal pengisian</label><input id="so-date" class="inp" type="date" value="${esc(so.date)}" data-change="setSign" data-field="date" data-emp="${esc(emp.id)}"></div>
+      </div>
+      <div class="lbl">Tanda tangan digital</div>
+      <div class="sigbox"><canvas id="sigpad" width="720" height="220" aria-label="Area tanda tangan"></canvas><div class="ph ${so.ttd?'off':''}" id="sig-ph">Tanda tangan di sini</div></div>
+      <button type="button" class="btn sm" style="margin-top:10px" data-act="clearSig" data-emp="${esc(emp.id)}">Hapus tanda tangan</button>
+    </section>
+    <div class="dfoot"><button type="button" class="btn danger" data-act="deleteEmp" data-id="${esc(emp.id)}">Hapus Proses Ini</button>
+      <div class="r"><button type="button" class="btn" data-act="openEdit" data-id="${esc(emp.id)}">Edit Data</button>
+        <button type="button" class="btn" data-act="exportPDF" data-id="${esc(emp.id)}">Export PDF</button>
+        ${isDone?`<button type="button" class="btn lime" data-act="reopen" data-id="${esc(emp.id)}">Buka Kembali</button>`
+                :`<button type="button" class="btn lime" data-act="markDone" data-id="${esc(emp.id)}">Tandai Selesai</button>`}</div></div>`;
+}
+function updateDetailUI(emp){
+  const p=computeProgress(emp);
+  $$('.item').forEach(row=>{
+    const st=emp.checklist[row.dataset.item]||{done:false};
+    const b=$('.stamp',row); b.classList.toggle('checked',!!st.done); b.setAttribute('aria-checked',!!st.done);
+    $('.item-title',row).classList.toggle('done',!!st.done);
+  });
+  const tpl=state.templates[emp.formType]||[];
+  $$('[data-catcount]').forEach(c=>{
+    const items=tpl.filter(i=>i.category===c.dataset.catcount);
+    c.textContent=items.filter(it=>emp.checklist[it.id]&&emp.checklist[it.id].done).length+'/'+items.length;
+  });
+  const fill=$('#d-fill'); if(fill){ fill.style.setProperty('--w',p.pct+'%'); fill.classList.toggle('done',p.pct===100); }
+  const st=statusOf(emp), pill=$('#d-status'); if(pill){ pill.className='pill p-'+st.key; pill.textContent=st.label; }
+  $('#d-pct').textContent=p.pct+'%'; $('#d-cnt').textContent=p.done+'/'+p.total+' item selesai';
+  $('#d-banner').innerHTML=bannerHtml(emp);
+}
+
+/* ---------- Tanda tangan ---------- */
+function setupSignaturePad(emp){
+  const canvas=$('#sigpad'); if(!canvas) return;
+  const ctx=canvas.getContext('2d'), ph=$('#sig-ph');
+  ctx.lineWidth=2.8; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#0b2a4a'; ctx.fillStyle='#0b2a4a';
+  if(emp.signOff.ttd){
+    const img=new Image();
+    img.onload=()=>{ const s=Math.min(canvas.width/img.width,canvas.height/img.height), w=img.width*s, h=img.height*s;
+      ctx.drawImage(img,(canvas.width-w)/2,(canvas.height-h)/2,w,h); };
+    img.src=emp.signOff.ttd;
+  }
+  let drawing=false,last=null,dirty=false;
+  const pos=e=>{ const r=canvas.getBoundingClientRect(); return {x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}; };
+  canvas.addEventListener('pointerdown',e=>{
+    e.preventDefault(); try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
+    drawing=true; dirty=true; last=pos(e); ph.classList.add('off');
+    ctx.beginPath(); ctx.arc(last.x,last.y,ctx.lineWidth/2,0,Math.PI*2); ctx.fill();
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!drawing) return; e.preventDefault();
+    const p=pos(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p;
+  });
+  const end=()=>{
+    if(!drawing) return; drawing=false;
+    if(dirty){ dirty=false; emp.signOff.ttd=canvas.toDataURL('image/png'); saveEmployee(emp); }
+  };
+  canvas.addEventListener('pointerup',end);
+  canvas.addEventListener('pointercancel',end);
+}
+
+/* ---------- Modal ---------- */
+function renderModals(){
+  const root=$('#modal-root'); let html='';
+  if(state.modal) html=employeeModalHtml();
+  else if(state.confirm) html=confirmModalHtml();
+  root.innerHTML=html;
+  document.body.classList.toggle('lock',!!html);
+  const f=$('#modal-root input,#modal-root select'); if(f&&state.modal) setTimeout(()=>f.focus(),30);
+  else if(state.confirm){ const b=$('#modal-root [data-act="confirmOk"]'); if(b) setTimeout(()=>b.focus(),30); }
+}
+function employeeModalHtml(){
+  const edit=state.modal.editId?getEmp(state.modal.editId):null;
+  const type=edit?edit.formType:state.type, m=edit?edit.meta:{};
+  const v=(x)=>esc(x||'');
+  let extra='';
+  if(type==='onboarding') extra=`<div class="fld"><label for="f-m1">Tanggal mulai kerja <span class="req">*</span></label><input id="f-m1" class="inp" type="date" value="${v(m.startDate)}"></div>`;
+  if(type==='mutasi') extra=`<div class="fld"><label for="f-m1">Jenis perubahan</label><select id="f-m1" class="sel">${['Promosi','Demosi','Rotasi'].map(o=>`<option ${m.changeType===o?'selected':''}>${o}</option>`).join('')}</select></div>
+    <div class="fld"><label for="f-m2">Posisi baru <span class="req">*</span></label><input id="f-m2" class="inp" type="text" placeholder="cth. Supervisor Marketing" value="${v(m.newPosition)}"></div>
+    <div class="fld"><label for="f-m3">Tanggal efektif <span class="req">*</span></label><input id="f-m3" class="inp" type="date" value="${v(m.effectiveDate)}"></div>`;
+  if(type==='resign') extra=`<div class="fld"><label for="f-m1">Tanggal resign <span class="req">*</span></label><input id="f-m1" class="inp" type="date" value="${v(m.resignDate)}"></div>
+    <div class="fld"><label for="f-m2">Alasan</label><select id="f-m2" class="sel">${['Resign Pribadi','Kontrak Selesai','PHK'].map(o=>`<option ${m.reason===o?'selected':''}>${o}</option>`).join('')}</select></div>`;
+  return `<div class="mbg" data-act="modalBg"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="modal-h"><h3 id="m-title">${edit?'Edit Data Proses':'Buat Proses Baru'}</h3><p>${esc(TYPES[type].full)}</p></div>
+    <div class="modal-b">
+      <div class="fld"><label for="f-name">Nama karyawan <span class="req">*</span></label><input id="f-name" class="inp" type="text" placeholder="cth. Dewi Anggraini" value="${v(edit&&edit.name)}"></div>
+      <div class="fld"><label for="f-pos">Posisi${type==='mutasi'?' saat ini':''} <span class="req">*</span></label><input id="f-pos" class="inp" type="text" placeholder="cth. Staff Marketing" value="${v(edit&&edit.position)}"></div>
+      <div class="fld"><label for="f-branch">Cabang</label><input id="f-branch" class="inp" type="text" placeholder="cth. Jakarta Pusat" value="${v(edit&&edit.branch)}"></div>
+      ${extra}<div class="err-msg" id="m-err" role="alert"></div></div>
+    <div class="modal-f"><button type="button" class="btn" data-act="closeModal">Batal</button>
+      <button type="button" class="btn primary" data-act="saveEmp">${edit?'Simpan Perubahan':'Buat Checklist'}</button></div></div></div>`;
+}
+function confirmModalHtml(){
+  const c=state.confirm;
+  return `<div class="mbg" data-act="modalBg"><div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="c-title" style="max-width:420px">
+    <div class="modal-h"><h3 id="c-title" style="${c.danger?'color:var(--red)':''}">${esc(c.title)}</h3><p>${esc(c.msg)}</p></div>
+    <div class="modal-f" style="padding-top:22px"><button type="button" class="btn" data-act="closeModal">Batal</button>
+      <button type="button" class="btn ${c.danger?'danger-solid':'primary'}" data-act="confirmOk">${esc(c.okLabel||'Ya, lanjutkan')}</button></div></div></div>`;
+}
+function askConfirm(opts){ state.modal=null; state.confirm=opts; renderModals(); }
+function closeModal(){ state.modal=null; state.confirm=null; renderModals(); }
+
+/* ---------- Actions ---------- */
+const A = {
+  setType(el){ state.type=el.dataset.key; state.tab='aktif'; state.activeId=null; state.q=''; state.fs='all'; render(); },
+  setTab(el){ state.tab=el.dataset.key; state.activeId=null; state.q=''; state.fs='all'; render(); },
+  openDetail(el){ state.activeId=el.dataset.id; render(); },
+  closeDetail(){ state.activeId=null; render(); },
+  clearSearch(){ state.q=''; state.fs='all'; render(); },
+  retry(){ loadAll(false); },
+  async refresh(){ const ok=await loadAll(true); toast(ok?'Data diperbarui':'Gagal memperbarui data', ok?'':'error'); },
+  openNew(){ state.confirm=null; state.modal={editId:null}; renderModals(); },
+  openEdit(el){ state.confirm=null; state.modal={editId:el.dataset.id}; renderModals(); },
+  closeModal(){ closeModal(); },
+  modalBg(el,e){ if(e.target===el) closeModal(); },
+  confirmOk(){ const run=state.confirm&&state.confirm.run; closeModal(); if(run) run(); },
+
+  async saveEmp(){
+    const edit=state.modal&&state.modal.editId?getEmp(state.modal.editId):null;
+    const type=edit?edit.formType:state.type;
+    const val=id=>{ const e=$('#'+id); return e?e.value.trim():''; };
+    const req=type==='onboarding'?['f-name','f-pos','f-m1']:type==='mutasi'?['f-name','f-pos','f-m2','f-m3']:['f-name','f-pos','f-m1'];
+    $$('#modal-root .invalid').forEach(x=>x.classList.remove('invalid'));
+    const missing=req.filter(id=>!val(id));
+    if(missing.length){
+      missing.forEach(id=>$('#'+id).classList.add('invalid'));
+      $('#m-err').textContent='Lengkapi kolom yang bertanda *.'; $('#'+missing[0]).focus(); return;
+    }
+    let meta={};
+    if(type==='onboarding') meta={startDate:val('f-m1')};
+    if(type==='mutasi') meta={changeType:val('f-m1'),newPosition:val('f-m2'),effectiveDate:val('f-m3')};
+    if(type==='resign') meta={resignDate:val('f-m1'),reason:val('f-m2')};
+    const data={name:val('f-name'),position:val('f-pos'),branch:val('f-branch'),meta};
+    if(edit){
+      Object.assign(edit,data); closeModal(); render();
+      guard(()=>saveEmployee(edit),'Data diperbarui');
+      return;
+    }
+    const emp=Object.assign({id:uid('emp'),formType:type,createdAt:new Date().toISOString(),checklist:{},signOff:{pic:'',ttd:'',date:''},status:'in_progress'},data);
+    state.employees.unshift(emp); closeModal(); render();
+    const ok=await guard(async()=>{ await saveEmployee(emp); await saveIndex(); });
+    if(ok) toast('Proses untuk '+emp.name+' dibuat');
+    else{ state.employees=state.employees.filter(e=>e!==emp); render(); }
+  },
+
+  async toggleItem(el){
+    const emp=getEmp(el.dataset.emp); if(!emp) return;
+    const id=el.dataset.id, prev=emp.checklist[id]?{...emp.checklist[id]}:null;
+    const cur=emp.checklist[id]||{done:false,note:''}; cur.done=!cur.done; emp.checklist[id]=cur;
+    updateDetailUI(emp);
+    try{ await saveEmployee(emp); }
+    catch(e){ if(prev) emp.checklist[id]=prev; else delete emp.checklist[id]; updateDetailUI(emp); }
+  },
+  markDone(el){
+    const emp=getEmp(el.dataset.id); if(!emp) return;
+    const doIt=async()=>{
+      emp.status='selesai'; if(!emp.signOff.date) emp.signOff.date=todayISO();
+      render(); if(await guard(()=>saveEmployee(emp),'Proses ditandai selesai')===false){ emp.status='in_progress'; render(); }
+    };
+    const p=computeProgress(emp);
+    if(p.pct<100) askConfirm({title:'Checklist belum lengkap',msg:(p.total-p.done)+' dari '+p.total+' item belum selesai. Tetap tandai proses ini selesai?',okLabel:'Ya, tandai selesai',run:doIt});
+    else doIt();
+  },
+  async reopen(el){
+    const emp=getEmp(el.dataset.id); if(!emp) return;
+    emp.status='in_progress'; render();
+    if(await guard(()=>saveEmployee(emp),'Proses dibuka kembali')===false){ emp.status='selesai'; render(); }
+  },
+  deleteEmp(el){
+    const emp=getEmp(el.dataset.id); if(!emp) return;
+    askConfirm({title:'Hapus proses ini?',msg:'Data “'+emp.name+'” beserta riwayat checklist-nya akan dihapus permanen.',okLabel:'Ya, hapus',danger:true,run:async()=>{
+      const backup=state.employees.slice();
+      state.employees=state.employees.filter(e=>e.id!==emp.id); state.activeId=null; render();
+      const ok=await guard(async()=>{ await storage.delete('employee:'+emp.id); await saveIndex(); },'Data dihapus');
+      if(!ok){ state.employees=backup; render(); }
+    }});
+  },
+  async clearSig(el){
+    const emp=getEmp(el.dataset.emp); if(!emp) return;
+    const c=$('#sigpad'); if(c) c.getContext('2d').clearRect(0,0,c.width,c.height);
+    $('#sig-ph').classList.remove('off');
+    emp.signOff.ttd=''; saveEmployee(emp);
+  },
+
+  /* admin */
+  async addCat(){
+    const el=$('#new-cat'), name=el.value.trim(); if(!name) return;
+    const cats=state.categories[state.type];
+    if(cats.includes(name)){ toast('Kategori sudah ada','error'); return; }
+    cats.push(name); render();
+    if(!(await guard(()=>saveCategories(state.type),'Kategori ditambahkan'))){ cats.pop(); render(); }
+  },
+  delCat(el){
+    const cats=curCats(), name=cats[+el.dataset.ci];
+    if(curTpl().some(i=>i.category===name)){ toast('Hapus atau pindahkan item di kategori ini dulu.','error'); return; }
+    askConfirm({title:'Hapus kategori?',msg:'Kategori “'+name+'” akan dihapus.',okLabel:'Ya, hapus',danger:true,run:async()=>{
+      state.categories[state.type]=cats.filter(c=>c!==name); render();
+      await guard(()=>saveCategories(state.type),'Kategori dihapus');
+    }});
+  },
+  async moveCat(el){
+    const cats=curCats(), i=+el.dataset.ci, j=i+(+el.dataset.dir);
+    if(j<0||j>=cats.length) return;
+    [cats[i],cats[j]]=[cats[j],cats[i]]; render(); await guard(()=>saveCategories(state.type));
+  },
+  async addItem(el){
+    const ci=+el.dataset.ci, cat=curCats()[ci], input=$('#new-item-'+ci), title=input.value.trim();
+    if(!title||cat===undefined) return;
+    const orders=curTpl().filter(i=>i.category===cat).map(i=>i.order);
+    curTpl().push({id:uid('itm'),title,category:cat,order:orders.length?Math.max(...orders)+1:0});
+    render(); await guard(()=>saveTemplate(state.type),'Item ditambahkan');
+  },
+  delItem(el){
+    const it=curTpl().find(i=>i.id===el.dataset.id); if(!it) return;
+    askConfirm({title:'Hapus item?',msg:'“'+it.title+'” dihapus dari template. Proses yang sedang berjalan ikut terpengaruh.',okLabel:'Ya, hapus',danger:true,run:async()=>{
+      state.templates[state.type]=curTpl().filter(i=>i.id!==it.id); render();
+      await guard(()=>saveTemplate(state.type),'Item dihapus');
+    }});
+  },
+  async moveItem(el){
+    const it=curTpl().find(i=>i.id===el.dataset.id); if(!it) return;
+    const sib=sortedItems(curTpl(),it.category), i=sib.indexOf(it), j=i+(+el.dataset.dir);
+    if(j<0||j>=sib.length) return;
+    [sib[i],sib[j]]=[sib[j],sib[i]]; sib.forEach((x,k)=>x.order=k);
+    render(); await guard(()=>saveTemplate(state.type));
+  },
+
+  exportPDF(el){ exportPDF(el.dataset.id); },
+  exportAll(){ exportAllPDF(); },
+  exportExcel(){ exportExcel(); }
+};
+const C = {
+  async setNote(el){ const emp=getEmp(el.dataset.emp); if(!emp) return;
+    const cur=emp.checklist[el.dataset.id]||{done:false,note:''}; cur.note=el.value; emp.checklist[el.dataset.id]=cur; saveEmployee(emp); },
+  async setSign(el){ const emp=getEmp(el.dataset.emp); if(!emp) return; emp.signOff[el.dataset.field]=el.value; saveEmployee(emp); },
+  setFs(el){ state.fs=el.value; $('#list').innerHTML=riwayatListHtml(); },
+  async renameCat(el){
+    const cats=curCats(), ci=+el.dataset.ci, old=cats[ci], nn=el.value.trim();
+    if(!nn||nn===old){ el.value=old; return; }
+    if(cats.includes(nn)){ toast('Nama kategori sudah dipakai','error'); el.value=old; return; }
+    cats[ci]=nn; curTpl().forEach(it=>{ if(it.category===old) it.category=nn; });
+    render();
+    await guard(async()=>{ await saveCategories(state.type); await saveTemplate(state.type); },'Kategori diubah');
+  },
+  async editItem(el){
+    const it=curTpl().find(i=>i.id===el.dataset.id); if(!it) return;
+    const v=el.value.trim(); if(!v){ el.value=it.title; return; }
+    if(v===it.title) return; it.title=v; await guard(()=>saveTemplate(state.type));
+  }
+};
+
+/* ---------- Event delegation ---------- */
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]'); if(!el) return;
+  const fn=A[el.dataset.act]; if(fn) fn(el,e);
+});
+document.addEventListener('change',e=>{
+  const el=e.target.closest('[data-change]'); if(!el) return;
+  const fn=C[el.dataset.change]; if(fn) fn(el,e);
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='q'){ state.q=e.target.value; const l=$('#list'); if(l) l.innerHTML=state.tab==='aktif'?aktifListHtml():riwayatListHtml(); }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&(state.modal||state.confirm)){ closeModal(); return; }
+  const t=e.target;
+  if(e.key==='Enter'&&t.dataset&&t.dataset.enter){ e.preventDefault(); const fn=A[t.dataset.enter]; if(fn) fn(t,e); return; }
+  if(e.key==='Enter'&&state.modal&&t.matches('#modal-root input')){ e.preventDefault(); A.saveEmp(); return; }
+  if((e.key==='Enter'||e.key===' ')&&t.matches&&t.matches('[role="button"][data-act]')){ e.preventDefault(); t.click(); }
+});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&!state.loading&&!state.modal&&!state.confirm&&!state.activeId&&state.tab!=='admin'&&Date.now()-lastLoad>60000){
+    loadAll(true);
+  }
+});
+
+/* ---------- Export PDF (gaya mockup: header putih, bar biru-lime, footer navy) ---------- */
+const PC={blue:[0,84,164],lime:[156,200,20],navy:[11,42,74],ink:[18,38,63],muted:[90,111,136],bg:[238,243,249],line:[185,202,223],ok:[61,90,0],bad:[192,57,43]};
+function drawEmployeePage(doc,emp){
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), mx=15;
+  const tpl=state.templates[emp.formType]||[], cats=state.categories[emp.formType]||[];
+  const p=computeProgress(emp), so=emp.signOff||{pic:'',ttd:'',date:''}, st=statusOf(emp);
+  // header
+  const logoH=18, logoW=logoH*LOGO.ratio;
+  if(LOGO.data){ try{ doc.addImage(LOGO.data,'PNG',mx,7,logoW,logoH); }catch(e){} }
+  const tx=mx+(LOGO.data?logoW+6:0);
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(...PC.blue);
+  doc.text(doc.splitTextToSize(TYPES[emp.formType].full.toUpperCase(),W-tx-mx-44),tx,14);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...PC.muted);
+  doc.text('Dicetak '+fmtDate(todayISO()),W-mx,13,{align:'right'});
+  doc.text('ID '+String(emp.id).slice(-8),W-mx,17.5,{align:'right'});
+  doc.setFillColor(...PC.blue); doc.rect(0,27,W*0.7,1.8,'F');
+  doc.setFillColor(...PC.lime); doc.rect(W*0.7,27,W*0.3,1.8,'F');
+  // info box
+  const rows=[['Nama',emp.name],['Posisi',emp.position],['Cabang',emp.branch||'-'],['Info',metaText(emp)],['Status',st.label.charAt(0)+st.label.slice(1).toLowerCase()+' ('+p.done+'/'+p.total+' item, '+p.pct+'%)']];
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  const valW=W-mx*2-6-30;
+  const wrapped=rows.map(r=>doc.splitTextToSize(String(r[1]||'-'),valW));
+  const lineH=4.6, boxH=wrapped.reduce((s,l)=>s+l.length*lineH+1.2,0)+6;
+  let y=35;
+  doc.setFillColor(...PC.bg); doc.roundedRect(mx,y,W-mx*2,boxH,2,2,'F');
+  let ry=y+6.5;
+  rows.forEach((r,i)=>{
+    doc.setFont('helvetica','bold'); doc.setTextColor(...PC.blue); doc.text(r[0],mx+4,ry);
+    doc.setFont('helvetica','normal'); doc.setTextColor(...PC.ink); doc.text(': ',mx+26,ry); doc.text(wrapped[i],mx+30,ry);
+    ry+=wrapped[i].length*lineH+1.2;
+  });
+  y+=boxH+8;
+  const heading=(txt,yy)=>{ doc.setFillColor(...PC.lime); doc.roundedRect(mx,yy-3.8,1.4,5,0.5,0.5,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...PC.blue); doc.text(txt,mx+4,yy); };
+  heading('Checklist',y);
+  const body=[]; let no=1;
+  cats.forEach(cat=>{
+    const items=sortedItems(tpl,cat); if(!items.length) return;
+    body.push([{content:cat.toUpperCase(),colSpan:4,styles:{fillColor:PC.bg,textColor:PC.blue,fontStyle:'bold',fontSize:8}}]);
+    items.forEach(it=>{ const s=emp.checklist[it.id]||{done:false,note:''}; body.push([no++,it.title,s.done?'Selesai':'Belum',s.note||'']); });
+  });
+  doc.autoTable({
+    startY:y+3, head:[['No','Item Checklist','Status','Catatan']], body, theme:'grid',
+    margin:{left:mx,right:mx,top:18,bottom:20},
+    headStyles:{fillColor:PC.blue,textColor:255,fontSize:8.5,halign:'left',lineColor:PC.blue},
+    styles:{fontSize:8.5,cellPadding:2.8,lineColor:PC.line,textColor:PC.ink,valign:'top'},
+    columnStyles:{0:{cellWidth:10,halign:'center'},1:{cellWidth:'auto'},2:{cellWidth:22,fontStyle:'bold'},3:{cellWidth:50}},
+    didParseCell:d=>{ if(d.section==='body'&&d.column.index===2){ if(d.cell.raw==='Selesai') d.cell.styles.textColor=PC.ok; else if(d.cell.raw==='Belum') d.cell.styles.textColor=PC.bad; } }
+  });
+  let fy=doc.lastAutoTable.finalY+12;
+  if(fy>H-20-52){ doc.addPage(); fy=24; }
+  heading('Pengesahan',fy);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...PC.blue);
+  doc.text('Nama PIC',mx,fy+10); doc.text('Tanggal',mx,fy+17); doc.text('Tanda Tangan Digital',W-mx-62,fy+10);
+  doc.setFont('helvetica','normal'); doc.setTextColor(...PC.ink);
+  doc.text(': '+(so.pic||'____________________'),mx+22,fy+10);
+  doc.text(': '+(so.date?fmtDate(so.date):'____________'),mx+22,fy+17);
+  doc.setDrawColor(...PC.blue); doc.setLineWidth(0.4); doc.line(W-mx-62,fy+34,W-mx,fy+34);
+  if(so.ttd&&so.ttd.indexOf('data:image')===0){
+    try{
+      let r=720/220; try{ const ip=doc.getImageProperties(so.ttd); r=ip.width/ip.height; }catch(e){}
+      let w=60,h=w/r; if(h>22){ h=22; w=h*r; }
+      doc.addImage(so.ttd,'PNG',W-mx-62,fy+33-h,w,h);
+    }catch(e){}
+  }
+}
+function drawPdfFooter(doc){
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), mx=15, n=doc.internal.getNumberOfPages();
+  for(let i=1;i<=n;i++){
+    doc.setPage(i);
+    doc.setFillColor(...PC.lime); doc.rect(0,H-13,W,1,'F');
+    doc.setFillColor(...PC.navy); doc.rect(0,H-12,W,12,'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(185,205,228);
+    doc.text('Tatalogam Group · Checklist Digital Human Capital',mx,H-5);
+    doc.text('Halaman '+i+' / '+n,W-mx,H-5,{align:'right'});
+  }
+}
+function safeName(s){ return String(s||'').replace(/[^\w\-]+/g,'_').replace(/^_+|_+$/g,'')||'data'; }
+function exportPDF(id){
+  const emp=getEmp(id);
+  if(!emp||!window.jspdf){ toast('Gagal export PDF. Muat ulang halaman lalu coba lagi.','error'); return; }
+  try{
+    const doc=new window.jspdf.jsPDF(); drawEmployeePage(doc,emp); drawPdfFooter(doc);
+    doc.save(safeName(TYPES[emp.formType].label)+'_'+safeName(emp.name)+'.pdf'); toast('PDF diunduh');
+  }catch(err){ console.error(err); toast('Gagal membuat PDF','error'); }
+}
+function exportAllPDF(){
+  if(!window.jspdf){ toast('Gagal export PDF. Muat ulang halaman lalu coba lagi.','error'); return; }
+  if(!state.employees.length){ toast('Belum ada data sama sekali','error'); return; }
+  try{
+    const order=Object.keys(TYPES);
+    const sorted=state.employees.slice().sort((a,b)=>{ const d=order.indexOf(a.formType)-order.indexOf(b.formType); return d||(a.createdAt||'').localeCompare(b.createdAt||''); });
+    const doc=new window.jspdf.jsPDF();
+    sorted.forEach((emp,i)=>{ if(i>0) doc.addPage(); drawEmployeePage(doc,emp); });
+    drawPdfFooter(doc); doc.save('Rekap_Semua_Checklist_HC_Tatalogam.pdf'); toast('PDF gabungan ('+sorted.length+' proses) diunduh');
+  }catch(err){ console.error(err); toast('Gagal membuat PDF','error'); }
+}
+function exportExcel(){
+  const list=typedEmployees();
+  if(!window.XLSX||!list.length){ toast('Belum ada data untuk diexport','error'); return; }
+  const tpl=curTpl(), cats=curCats();
+  const summary=list.map(emp=>{ const p=computeProgress(emp), so=emp.signOff||{};
+    return {Nama:emp.name,Posisi:emp.position,Cabang:emp.branch||'-',Info:metaText(emp),Status:statusOf(emp).label.charAt(0)+statusOf(emp).label.slice(1).toLowerCase(),
+      'Progress (%)':p.pct,'Item Selesai':p.done,'Total Item':p.total,'Nama PIC':so.pic||'','TTD':so.ttd?'Sudah tanda tangan (lihat PDF)':'Belum','Tanggal Pengisian':so.date||''}; });
+  const detail=[];
+  list.forEach(emp=>cats.forEach(cat=>sortedItems(tpl,cat).forEach(it=>{ const s=emp.checklist[it.id]||{done:false,note:''};
+    detail.push({Nama:emp.name,Kategori:cat,Item:it.title,Status:s.done?'Selesai':'Belum',Catatan:s.note||''}); })));
+  try{
+    const wb=XLSX.utils.book_new();
+    const s1=XLSX.utils.json_to_sheet(summary), s2=XLSX.utils.json_to_sheet(detail);
+    s1['!cols']=[{wch:24},{wch:24},{wch:16},{wch:44},{wch:12},{wch:12},{wch:12},{wch:10},{wch:20},{wch:28},{wch:16}];
+    s2['!cols']=[{wch:24},{wch:26},{wch:52},{wch:10},{wch:36}];
+    XLSX.utils.book_append_sheet(wb,s1,'Ringkasan'); XLSX.utils.book_append_sheet(wb,s2,'Detail Item');
+    XLSX.writeFile(wb,safeName(TYPES[state.type].label)+'_Tatalogam.xlsx'); toast('Excel diunduh');
+  }catch(err){ console.error(err); toast('Gagal membuat Excel','error'); }
+}
+
+/* ---------- Start ---------- */
+render();
+loadAll(false);
+})();
+
+</script>
 </body>
 </html>
